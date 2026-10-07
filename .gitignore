@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Figma exports used as reference only (assets used by the app live in src/ and public/)
+design/
+
 # Environment
 .env
 .env.*

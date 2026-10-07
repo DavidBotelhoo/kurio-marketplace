@@ -1,7 +1,7 @@
 export function App() {
   return (
-    <main>
-      <h1>NFT Marketplace</h1>
+    <main className="mx-auto grid min-h-dvh max-w-content place-items-center px-4">
+      <h1 className="text-14 font-bold tracking-brand">KURIO</h1>
     </main>
   )
 }

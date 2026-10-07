@@ -48,6 +48,18 @@ export default defineConfig([
         'error',
         { allowNumber: true },
       ],
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'cn',
+              message:
+                'Import cn from "@/lib/utils": it knows the custom theme scales.',
+            },
+          ],
+        },
+      ],
     },
   },
   {
