@@ -54,7 +54,12 @@ test.describe('Regressão visual', () => {
   test('carrinho', async ({ app, page }) => {
     await app.open('/')
     await app.login('nova', '/carrinho')
-    await expect(page.getByText('Total', { exact: true })).toBeVisible()
+    // The table also has a "Total" column: wait for the summary's own total.
+    await expect(
+      page
+        .getByRole('region', { name: 'Resumo da carteira' })
+        .getByText('Total', { exact: true }),
+    ).toBeVisible()
     await stabilize(page)
     await expect(page).toHaveScreenshot('carrinho.png', { fullPage: true })
   })

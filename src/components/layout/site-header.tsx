@@ -11,8 +11,10 @@ import { cn } from '@/lib/utils'
 
 const MARKET_PATHS = /^\/(nfts|carrinho|pagamento|pedidos)(\/|$)/
 
+// Figma: 40px between labels, baselines at 40.7px, the active underline as
+// wide as the label and resting on the header divider (69px tall header).
 const navItemClass =
-  'relative block px-2.5 pt-[3px] pb-6 text-16 whitespace-nowrap text-foreground transition-colors hover:text-highlight data-[active=true]:font-bold data-[active=true]:text-highlight data-[active=true]:after:absolute data-[active=true]:after:inset-x-0 data-[active=true]:after:-bottom-px data-[active=true]:after:h-[3px] data-[active=true]:after:bg-primary'
+  'relative block pb-[1.4375rem] text-16 leading-[1.3125rem] whitespace-nowrap text-foreground transition-colors hover:text-highlight data-[active=true]:font-bold data-[active=true]:text-highlight data-[active=true]:after:absolute data-[active=true]:after:inset-x-0 data-[active=true]:after:-bottom-px data-[active=true]:after:h-[3px] data-[active=true]:after:bg-primary'
 
 function useActiveSection() {
   const { pathname, hash } = useLocation()
@@ -26,7 +28,7 @@ function MainNav() {
 
   return (
     <nav aria-label="Principal">
-      <ul className="flex gap-6 lg:gap-[2.375rem]">
+      <ul className="flex gap-8 lg:gap-10">
         <li>
           <Link
             to="/"
@@ -100,11 +102,12 @@ export function SiteHeader() {
   return (
     <header className="hidden md:block">
       <div className="container-page">
-        <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-6 border-b border-primary/40 pt-6">
+        {/* xl: the menu starts where the 1440 frame puts it (x = 496). */}
+        <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-6 border-b border-primary/40 pt-6 xl:grid-cols-[22rem_auto_1fr]">
           <Link
             to="/"
             aria-label="Kurio, página inicial"
-            className="mt-2.5 justify-self-start text-14 font-bold tracking-brand text-foreground"
+            className="mt-1.5 justify-self-start text-14 font-bold tracking-brand text-foreground"
           >
             KURIO
           </Link>

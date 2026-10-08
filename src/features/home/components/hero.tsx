@@ -10,6 +10,7 @@ import { topics } from '@/contracts/realtime-topics'
 import { CATALOG_ANCHOR } from '@/features/catalog/components/catalog-anchor'
 import { NftImage } from '@/features/catalog/components/nft-image'
 import { highlightsQueryOptions } from '@/features/catalog/queries'
+import { useSwipe } from '@/hooks/use-swipe'
 import { useRealtimeTopics } from '@/lib/realtime/hooks'
 import { cn } from '@/lib/utils'
 
@@ -19,6 +20,29 @@ function useHeroSlides() {
   useRealtimeTopics(slides.map((nft) => topics.nft(nft.id)))
   return { slides, isPending }
 }
+
+/** Active slide, changed by the dots or by swiping/dragging the artwork. */
+function useHeroCarousel(count: number) {
+  const [active, setActive] = useState(0)
+  const swipe = useSwipe({
+    enabled: count > 1,
+    onNext: () => {
+      setActive((index) => (index + 1) % count)
+    },
+    onPrevious: () => {
+      setActive((index) => (index - 1 + count) % count)
+    },
+  })
+  return { active, setActive, swipe }
+}
+
+/** Follows the pointer while dragging; settles back with a short transition. */
+function dragStyle(swipe: ReturnType<typeof useSwipe>) {
+  return { transform: `translateX(${String(swipe.offset)}px)` }
+}
+
+const settleClass =
+  'transition-transform duration-200 motion-reduce:transition-none'
 
 interface DotsProps {
   slides: readonly NftSummary[]
@@ -70,28 +94,30 @@ function HeroDots({
 /** Desktop/tablet hero (1440 frame): copy on the left, 450px artwork on the right. */
 export function HeroDesktop() {
   const { slides, isPending } = useHeroSlides()
-  const [active, setActive] = useState(0)
+  const { active, setActive, swipe } = useHeroCarousel(slides.length)
   const current = slides[Math.min(active, slides.length - 1)]
 
+  // From lg on, the copy follows the Figma frame's vertical rhythm (baselines
+  // at 56, 119 and 228 px from the artwork's top); tablets center it instead.
   return (
     <section
       aria-labelledby="hero-title"
-      className="container-page mt-8 grid items-center gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,28.125rem)] lg:mt-8"
+      className="container-page mt-8 grid items-center gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,28.125rem)] lg:items-start"
     >
-      <div className="md:pl-10">
+      <div className="md:pl-10 lg:pt-10">
         <p className="text-14 font-medium tracking-brand">Bem-vindo à Kurio</p>
         <h1
           id="hero-title"
-          className="mt-[1.375rem] max-w-[32.5rem] text-32 leading-[1.4] font-bold lg:text-43 lg:leading-[4.375rem]"
+          className="mt-[1.375rem] max-w-[32.5rem] text-32 leading-[1.4] font-bold lg:mt-[0.3125rem] lg:text-43 lg:leading-[4.375rem]"
         >
           SEJA DONO DO FUTURO DA ARTE DIGITAL
         </h1>
-        <p className="mt-4 max-w-[24.5rem] text-14 leading-[1.57] text-muted-foreground">
+        <p className="mt-4 max-w-[35rem] text-14 leading-6 text-muted-foreground lg:mt-1">
           Descubra NFTs selecionados de criadores emergentes e consagrados.
           Colecione arte digital rara, apoie artistas e tenha uma parte da
           cultura da internet.
         </p>
-        <Button asChild className="mt-[1.875rem] h-10 w-35 text-16">
+        <Button asChild className="mt-[1.875rem] h-10 w-35 text-16 lg:mt-8">
           <Link to="/" hash={CATALOG_ANCHOR}>
             EXPLORAR
           </Link>
@@ -100,17 +126,24 @@ export function HeroDesktop() {
           slides={slides}
           active={active}
           onSelect={setActive}
-          className="mt-5 gap-0 md:justify-end"
+          className="mt-5 gap-0 md:justify-end lg:mt-9 lg:pr-[3.375rem]"
           dotClassName="size-2"
         />
       </div>
-      <div className="aspect-square w-full">
+      <div
+        {...swipe.handlers}
+        className="aspect-square w-full touch-pan-y select-none"
+      >
         {current ? (
           <Link
             to="/nfts/$nftId"
             params={{ nftId: current.id }}
             aria-label={`Ver ${current.name}`}
-            className="block size-full rounded-[1.5rem] outline-offset-4"
+            style={dragStyle(swipe)}
+            className={cn(
+              'block size-full rounded-[1.5rem] outline-offset-4',
+              swipe.dragging ? 'cursor-grabbing' : settleClass,
+            )}
           >
             <NftImage
               image={current.image}
@@ -135,14 +168,17 @@ export function HeroDesktop() {
 /** Mobile hero banner (414 frame): rounded card with two artworks. */
 export function HeroMobile() {
   const { slides, isPending } = useHeroSlides()
-  const [active, setActive] = useState(0)
+  const { active, setActive, swipe } = useHeroCarousel(slides.length)
   const current = slides[Math.min(active, slides.length - 1)]
   const next =
     slides.length > 1 ? slides[(active + 1) % slides.length] : undefined
 
   return (
     <section aria-labelledby="hero-title" className="container-page mt-4">
-      <div className="relative overflow-hidden rounded-[1.875rem] bg-linear-to-br from-primary/20 to-primary/10 px-3.5 pt-[0.4375rem] pb-2">
+      <div
+        {...swipe.handlers}
+        className="relative touch-pan-y overflow-hidden rounded-[1.875rem] bg-linear-to-br from-primary/20 to-primary/10 px-3.5 pt-[0.4375rem] pb-2 select-none"
+      >
         <span
           aria-hidden="true"
           className="pointer-events-none absolute -top-8 -left-20 size-[15.5rem] rounded-full bg-linear-to-b from-[#dd9a5f]/40 to-primary/5"
@@ -172,7 +208,13 @@ export function HeroMobile() {
               <ArrowRightIcon aria-hidden="true" className="size-3" />
             </Link>
           </div>
-          <div className="relative aspect-square w-full">
+          <div
+            style={dragStyle(swipe)}
+            className={cn(
+              'relative aspect-square w-full',
+              !swipe.dragging && settleClass,
+            )}
+          >
             {current ? (
               <Link
                 to="/nfts/$nftId"

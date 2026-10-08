@@ -39,7 +39,7 @@ export function CatalogTabs() {
     <div
       role="group"
       aria-label="Seções do catálogo"
-      className="-mx-1 flex [scrollbar-width:none] gap-3.5 overflow-x-auto px-1 pt-1 md:gap-12 md:overflow-visible"
+      className="-mx-1 flex [scrollbar-width:none] gap-3.5 overflow-x-auto px-1 pt-1 md:gap-[1.3125rem] md:overflow-visible"
     >
       {TABS.map((tab) => {
         const selected = tab.id === active

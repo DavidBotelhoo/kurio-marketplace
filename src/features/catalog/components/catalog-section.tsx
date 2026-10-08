@@ -18,7 +18,7 @@ export function CatalogSection({ desktop, sidebarExtra }: CatalogSectionProps) {
     <section
       id={CATALOG_ANCHOR}
       aria-labelledby="catalog-title"
-      className="container-page mt-8 scroll-mt-6 lg:mt-24"
+      className="container-page mt-8 scroll-mt-6 lg:mt-[5.625rem]"
     >
       <h2 id="catalog-title" className="sr-only">
         Catálogo de NFTs
@@ -37,7 +37,9 @@ export function CatalogSection({ desktop, sidebarExtra }: CatalogSectionProps) {
           </aside>
         ) : null}
         <div className="min-w-0">
-          <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
+          {/* Baseline alignment: the tabs' underline padding must not push
+              "Ordenar por" off their text line. */}
+          <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-4">
             <CatalogTabs />
             <SortSelect className="max-md:hidden" />
           </div>
