@@ -1,5 +1,5 @@
-import { Link } from '@tanstack/react-router'
-import type { ComponentType } from 'react'
+import { Link, useLocation } from '@tanstack/react-router'
+import { type ComponentType, useEffect, useRef } from 'react'
 
 import {
   ActivityIcon,
@@ -22,7 +22,11 @@ type NavItem =
   | {
       label: string
       Icon: ComponentType<IconProps>
-      to: '/perfil' | '/perfil/carteiras' | '/perfil/favoritos'
+      to:
+        | '/perfil'
+        | '/perfil/carteiras'
+        | '/perfil/atividade'
+        | '/perfil/favoritos'
       exact?: boolean
     }
   | { label: string; Icon: ComponentType<IconProps>; feature: string }
@@ -31,11 +35,7 @@ type NavItem =
 const ITEMS: readonly NavItem[] = [
   { label: 'Dados do perfil', Icon: UserIcon, to: '/perfil', exact: true },
   { label: 'Carteiras', Icon: LocationIcon, to: '/perfil/carteiras' },
-  {
-    label: 'Atividade',
-    Icon: ShoppingCartIcon,
-    feature: 'O histórico de atividade',
-  },
+  { label: 'Atividade', Icon: ShoppingCartIcon, to: '/perfil/atividade' },
   { label: 'Lista de interesse', Icon: HeartIcon, to: '/perfil/favoritos' },
   { label: 'Ofertas', Icon: ActivityIcon, feature: 'A área de ofertas' },
   {
@@ -121,6 +121,19 @@ const pillClass =
 export function ProfileMobileNav({ className }: { className?: string }) {
   const user = useCurrentUser()
   const logout = useLogoutMutation()
+  const listRef = useRef<HTMLUListElement>(null)
+  const pathname = useLocation({ select: (location) => location.pathname })
+
+  // Keep the current section's pill in view (the list scrolls sideways).
+  useEffect(() => {
+    const list = listRef.current
+    const active = list?.querySelector<HTMLElement>('[data-status="active"]')
+    if (!list || !active) return
+    list.scrollTo({
+      left: active.offsetLeft - (list.clientWidth - active.offsetWidth) / 2,
+      behavior: 'auto',
+    })
+  }, [pathname])
   return (
     <div className={className}>
       {user ? (
@@ -135,7 +148,10 @@ export function ProfileMobileNav({ className }: { className?: string }) {
         </div>
       ) : null}
       <nav aria-label="Seções do perfil" className="-mx-(--gutter) mt-5">
-        <ul className="flex [scrollbar-width:none] gap-2 overflow-x-auto px-(--gutter) pb-1 [&::-webkit-scrollbar]:hidden">
+        <ul
+          ref={listRef}
+          className="relative flex [scrollbar-width:none] gap-2 overflow-x-auto px-(--gutter) pb-1 [&::-webkit-scrollbar]:hidden"
+        >
           {ITEMS.map((item) => (
             <li key={item.label} className="shrink-0">
               {'to' in item ? (

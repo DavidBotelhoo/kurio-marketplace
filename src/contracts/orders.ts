@@ -22,6 +22,7 @@ import {
  *   409 CONFLICT: the quote already created another order (details.orderId)
  *   409 WALLET_DISCONNECTED: the wallet connection ended
  *   422 VALIDATION_ERROR: collector fields, or a missing Idempotency-Key
+ * GET  /orders          → 200 OrdersResponse (most recent first)
  * GET  /orders/:orderId → 200 Order · 404
  *
  * Status: "pending" → "confirmed" | "rejected" (terminal). Changes arrive
@@ -132,6 +133,12 @@ export const orderSchema = z.object({
 })
 
 export type Order = z.infer<typeof orderSchema>
+
+export const ordersResponseSchema = z.object({
+  items: z.array(orderSchema),
+})
+
+export type OrdersResponse = z.infer<typeof ordersResponseSchema>
 
 export const quoteOutdatedDetailsSchema = z.object({
   quote: quoteResponseSchema,

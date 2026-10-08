@@ -25,6 +25,22 @@ export function orderQueryOptions(userId: string, orderId: string) {
   })
 }
 
+export function ordersQueryOptions(userId: string) {
+  return queryOptions({
+    queryKey: orderKeys.list(userId),
+    queryFn: async ({ signal }) => (await loadApi()).fetchOrders(signal),
+  })
+}
+
+/** Order history ("Atividade"), most recent first. */
+export function useOrders() {
+  const userId = useSessionUserId()
+  return useQuery({
+    ...ordersQueryOptions(userId ?? ''),
+    enabled: userId !== null,
+  })
+}
+
 export function useOrder(orderId: string) {
   const userId = useSessionUserId()
   return useQuery({
@@ -47,6 +63,8 @@ export function storeOrder(
   const current = queryClient.getQueryData(queryKey)
   if (current && current.version >= order.version) return false
   queryClient.setQueryData(queryKey, order)
+  // The history lists this order too.
+  void queryClient.invalidateQueries({ queryKey: orderKeys.list(userId) })
   if (order.status === 'confirmed') {
     // The API removed the purchased items from the cart.
     void queryClient.invalidateQueries({

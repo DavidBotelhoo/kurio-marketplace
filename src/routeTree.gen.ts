@@ -20,6 +20,7 @@ import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated
 import { Route as NftsNftIdRouteImport } from './routes/nfts.$nftId'
 import { Route as AuthenticatedPedidosOrderIdRouteImport } from './routes/_authenticated/pedidos.$orderId'
 import { Route as AuthenticatedPerfilIndexRouteImport } from './routes/_authenticated/perfil.index'
+import { Route as AuthenticatedPerfilAtividadeRouteImport } from './routes/_authenticated/perfil.atividade'
 import { Route as AuthenticatedPerfilCarteirasRouteImport } from './routes/_authenticated/perfil.carteiras'
 import { Route as AuthenticatedPerfilFavoritosRouteImport } from './routes/_authenticated/perfil.favoritos'
 
@@ -78,6 +79,12 @@ const AuthenticatedPerfilIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedPerfilRoute,
   } as any)
+const AuthenticatedPerfilAtividadeRoute =
+  AuthenticatedPerfilAtividadeRouteImport.update({
+    id: '/atividade',
+    path: '/atividade',
+    getParentRoute: () => AuthenticatedPerfilRoute,
+  } as any)
 const AuthenticatedPerfilCarteirasRoute =
   AuthenticatedPerfilCarteirasRouteImport.update({
     id: '/carteiras',
@@ -100,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/perfil': typeof AuthenticatedPerfilRouteWithChildren
   '/nfts/$nftId': typeof NftsNftIdRoute
   '/pedidos/$orderId': typeof AuthenticatedPedidosOrderIdRoute
+  '/perfil/atividade': typeof AuthenticatedPerfilAtividadeRoute
   '/perfil/carteiras': typeof AuthenticatedPerfilCarteirasRoute
   '/perfil/favoritos': typeof AuthenticatedPerfilFavoritosRoute
   '/perfil/': typeof AuthenticatedPerfilIndexRoute
@@ -112,6 +120,7 @@ export interface FileRoutesByTo {
   '/pagamento': typeof AuthenticatedPagamentoRoute
   '/nfts/$nftId': typeof NftsNftIdRoute
   '/pedidos/$orderId': typeof AuthenticatedPedidosOrderIdRoute
+  '/perfil/atividade': typeof AuthenticatedPerfilAtividadeRoute
   '/perfil/carteiras': typeof AuthenticatedPerfilCarteirasRoute
   '/perfil/favoritos': typeof AuthenticatedPerfilFavoritosRoute
   '/perfil': typeof AuthenticatedPerfilIndexRoute
@@ -128,6 +137,7 @@ export interface FileRoutesById {
   '/_authenticated/perfil': typeof AuthenticatedPerfilRouteWithChildren
   '/nfts/$nftId': typeof NftsNftIdRoute
   '/_authenticated/pedidos/$orderId': typeof AuthenticatedPedidosOrderIdRoute
+  '/_authenticated/perfil/atividade': typeof AuthenticatedPerfilAtividadeRoute
   '/_authenticated/perfil/carteiras': typeof AuthenticatedPerfilCarteirasRoute
   '/_authenticated/perfil/favoritos': typeof AuthenticatedPerfilFavoritosRoute
   '/_authenticated/perfil/': typeof AuthenticatedPerfilIndexRoute
@@ -143,6 +153,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/nfts/$nftId'
     | '/pedidos/$orderId'
+    | '/perfil/atividade'
     | '/perfil/carteiras'
     | '/perfil/favoritos'
     | '/perfil/'
@@ -155,6 +166,7 @@ export interface FileRouteTypes {
     | '/pagamento'
     | '/nfts/$nftId'
     | '/pedidos/$orderId'
+    | '/perfil/atividade'
     | '/perfil/carteiras'
     | '/perfil/favoritos'
     | '/perfil'
@@ -170,6 +182,7 @@ export interface FileRouteTypes {
     | '/_authenticated/perfil'
     | '/nfts/$nftId'
     | '/_authenticated/pedidos/$orderId'
+    | '/_authenticated/perfil/atividade'
     | '/_authenticated/perfil/carteiras'
     | '/_authenticated/perfil/favoritos'
     | '/_authenticated/perfil/'
@@ -262,6 +275,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPerfilIndexRouteImport
       parentRoute: typeof AuthenticatedPerfilRoute
     }
+    '/_authenticated/perfil/atividade': {
+      id: '/_authenticated/perfil/atividade'
+      path: '/atividade'
+      fullPath: '/perfil/atividade'
+      preLoaderRoute: typeof AuthenticatedPerfilAtividadeRouteImport
+      parentRoute: typeof AuthenticatedPerfilRoute
+    }
     '/_authenticated/perfil/carteiras': {
       id: '/_authenticated/perfil/carteiras'
       path: '/carteiras'
@@ -292,12 +312,14 @@ const AuthRouteChildren: AuthRouteChildren = {
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface AuthenticatedPerfilRouteChildren {
+  AuthenticatedPerfilAtividadeRoute: typeof AuthenticatedPerfilAtividadeRoute
   AuthenticatedPerfilCarteirasRoute: typeof AuthenticatedPerfilCarteirasRoute
   AuthenticatedPerfilFavoritosRoute: typeof AuthenticatedPerfilFavoritosRoute
   AuthenticatedPerfilIndexRoute: typeof AuthenticatedPerfilIndexRoute
 }
 
 const AuthenticatedPerfilRouteChildren: AuthenticatedPerfilRouteChildren = {
+  AuthenticatedPerfilAtividadeRoute: AuthenticatedPerfilAtividadeRoute,
   AuthenticatedPerfilCarteirasRoute: AuthenticatedPerfilCarteirasRoute,
   AuthenticatedPerfilFavoritosRoute: AuthenticatedPerfilFavoritosRoute,
   AuthenticatedPerfilIndexRoute: AuthenticatedPerfilIndexRoute,

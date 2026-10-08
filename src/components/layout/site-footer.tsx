@@ -181,7 +181,9 @@ export function SiteFooter({ className }: { className?: string | undefined }) {
               />
             </li>
             <li>
-              <UnavailableAction feature="Atividade" className={linkClass} />
+              <Link to="/perfil/atividade" className={linkClass}>
+                Atividade
+              </Link>
             </li>
             <li>
               <UnavailableAction

@@ -3,12 +3,14 @@ import { HttpResponse } from 'msw'
 import {
   createOrderRequestSchema,
   IDEMPOTENCY_HEADER,
+  type OrdersResponse,
 } from '@/contracts/orders'
 
 import { requireSession } from '../auth'
 import {
   createOrder,
   getOrder,
+  listOrders,
   OrderError,
   settleDueOrders,
 } from '../domain/orders'
@@ -66,6 +68,19 @@ export const ordersHandlers = [
       } catch (error) {
         return orderErrorResponse(error)
       }
+    },
+  ),
+
+  route(
+    'get',
+    '/orders',
+    { operation: 'orders.list', label: 'Pedidos (histórico)' },
+    async ({ request }) => {
+      const check = requireSession(request)
+      if (!check.ok) return check.response
+      await settleDueOrders()
+      const body: OrdersResponse = { items: listOrders(check.user.id) }
+      return HttpResponse.json(body)
     },
   ),
 

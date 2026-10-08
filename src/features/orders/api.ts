@@ -3,6 +3,8 @@ import {
   IDEMPOTENCY_HEADER,
   type Order,
   orderSchema,
+  type OrdersResponse,
+  ordersResponseSchema,
 } from '@/contracts/orders'
 import { api } from '@/lib/api/client'
 import { parseResponse } from '@/lib/api/parse'
@@ -27,4 +29,11 @@ export async function fetchOrder(
     { signal },
   )
   return parseResponse(orderSchema, data)
+}
+
+export async function fetchOrders(
+  signal?: AbortSignal,
+): Promise<OrdersResponse> {
+  const { data } = await api.get<unknown>('/orders', { signal })
+  return parseResponse(ordersResponseSchema, data)
 }

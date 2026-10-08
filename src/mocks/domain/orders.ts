@@ -255,6 +255,15 @@ export function createOrder(
   return { order: toOrderDto(record), replayed: false }
 }
 
+/** The collector's orders, most recent first. */
+export function listOrders(userId: string) {
+  return db
+    .read()
+    .orders.filter((order) => order.userId === userId)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .map(toOrderDto)
+}
+
 export function getOrder(userId: string, orderId: string) {
   const record = db
     .read()
