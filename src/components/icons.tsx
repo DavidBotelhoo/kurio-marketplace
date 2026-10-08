@@ -594,3 +594,18 @@ export function ThankYouIllustration(props: IconProps) {
     </Icon>
   )
 }
+
+/** Selected state (filters). Not in Figma: drawn to match the icon set. */
+export function CheckIcon(props: IconProps) {
+  return (
+    <Icon viewBox="0 0 12 12" {...props}>
+      <path
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.6"
+        d="m2 6.4 2.6 2.6L10 3"
+      />
+    </Icon>
+  )
+}

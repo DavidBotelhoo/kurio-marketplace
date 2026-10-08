@@ -3,10 +3,8 @@ import { Link, useLocation } from '@tanstack/react-router'
 import { CartIcon, SearchIcon } from '@/components/icons'
 import { UnavailableAction } from '@/components/unavailable-action'
 import { AccountActions } from '@/features/auth/components/account-actions'
+import { CATALOG_ANCHOR } from '@/features/catalog/components/catalog-anchor'
 import { cn } from '@/lib/utils'
-
-/** Catalog anchor on the home page; "Mercado" scrolls to it. */
-export const CATALOG_HASH = 'mercado'
 
 const MARKET_PATHS = /^\/(nfts|carrinho|pagamento|pedidos)(\/|$)/
 
@@ -15,7 +13,7 @@ const navItemClass =
 
 function useActiveSection() {
   const { pathname, hash } = useLocation()
-  if (pathname === '/') return hash === CATALOG_HASH ? 'market' : 'home'
+  if (pathname === '/') return hash === CATALOG_ANCHOR ? 'market' : 'home'
   if (MARKET_PATHS.test(pathname)) return 'market'
   return null
 }
@@ -39,7 +37,7 @@ function MainNav() {
         <li>
           <Link
             to="/"
-            hash={CATALOG_HASH}
+            hash={CATALOG_ANCHOR}
             activeOptions={{ exact: true, includeHash: true }}
             data-active={active === 'market'}
             className={navItemClass}
@@ -73,7 +71,8 @@ function HeaderActions() {
     <div className="flex items-center gap-7">
       <Link
         to="/"
-        hash={CATALOG_HASH}
+        hash={CATALOG_ANCHOR}
+        state={{ focusSearch: true }}
         aria-label="Buscar NFTs"
         className="text-foreground transition-colors hover:text-highlight"
       >

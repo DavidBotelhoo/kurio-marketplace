@@ -9,6 +9,8 @@ import {
   YoutubeIcon,
 } from '@/components/icons'
 import { UnavailableAction } from '@/components/unavailable-action'
+import { CATEGORIES } from '@/contracts/catalog-taxonomy'
+import { CATALOG_ANCHOR } from '@/features/catalog/components/catalog-anchor'
 import { notifyUnavailable } from '@/lib/unavailable'
 import { cn } from '@/lib/utils'
 
@@ -37,6 +39,13 @@ const SOCIAL = [
   { name: 'LinkedIn', Icon: LinkedinIcon },
   { name: 'YouTube', Icon: YoutubeIcon },
 ] as const
+
+/** Footer shortcuts to the catalog filtered by collection (as in Figma). */
+const FOOTER_COLLECTIONS = CATEGORIES.filter((category) =>
+  ['arte-digital', 'fotografia', 'musica', 'arte-3d', 'utilidade'].includes(
+    category.id,
+  ),
+)
 
 const linkClass =
   'cursor-pointer text-left text-14 leading-[1.7rem] text-foreground transition-colors hover:text-highlight'
@@ -214,16 +223,15 @@ export function SiteFooter({ className }: { className?: string | undefined }) {
             Coleções
           </h2>
           <ul className="mt-2.5">
-            {[
-              'Arte digital',
-              'Fotografia',
-              'Música',
-              'Arte 3D',
-              'Utilidade',
-            ].map((item) => (
-              <li key={item}>
-                <Link to="/" hash="mercado" className={linkClass}>
-                  {item}
+            {FOOTER_COLLECTIONS.map(({ id, label }) => (
+              <li key={id}>
+                <Link
+                  to="/"
+                  search={{ categories: [id] }}
+                  hash={CATALOG_ANCHOR}
+                  className={linkClass}
+                >
+                  {label}
                 </Link>
               </li>
             ))}

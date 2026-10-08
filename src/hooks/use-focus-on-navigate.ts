@@ -17,6 +17,10 @@ export function useFocusOnNavigate(mainId: string) {
         // An open dialog manages its own focus (and traps it).
         if (document.querySelector('[role="dialog"][data-state="open"]')) return
         const main = document.getElementById(mainId)
+        // The new page already focused something on purpose (e.g. the
+        // catalog search opened from the header): keep it.
+        const active = document.activeElement
+        if (main && active && active !== main && main.contains(active)) return
         const target = main?.querySelector<HTMLElement>('h1') ?? main
         if (!target) return
         if (!target.hasAttribute('tabindex'))
