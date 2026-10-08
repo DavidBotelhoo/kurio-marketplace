@@ -14,6 +14,7 @@ import {
 } from './config'
 import { activeSessionCount, expireAllSessions } from './auth'
 import { db } from './db/database'
+import { expireCoupon } from './domain/cart'
 import { changeNftPrice, setEditionAvailability } from './domain/catalog'
 import type { MockDatabase } from './db/schema'
 import { handlers } from './handlers'
@@ -78,6 +79,10 @@ export interface KurioMocksApi {
     expireSessions: () => void
     activeSessions: () => number
   }
+  coupons: {
+    /** Makes a coupon expire now (applied coupons stop discounting). */
+    expire: typeof expireCoupon
+  }
   /** Server-side realtime controls; events reach the app via socket.io-client. */
   realtime: {
     changePrice: typeof changeNftPrice
@@ -128,6 +133,7 @@ export async function startMocks(overrides: MockUrlOverrides) {
       expireSessions: expireAllSessions,
       activeSessions: activeSessionCount,
     },
+    coupons: { expire: expireCoupon },
     realtime: {
       changePrice: changeNftPrice,
       setAvailability: setEditionAvailability,

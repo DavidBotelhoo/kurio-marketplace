@@ -6,7 +6,7 @@ import type { CategoryId, NetworkId } from '@/contracts/catalog'
  */
 
 /** Bump whenever record shapes change; stale snapshots are reseeded. */
-export const DB_VERSION = 6
+export const DB_VERSION = 7
 
 /**
  * Seed variants: "default" is the full catalog; "empty-catalog" keeps users
@@ -101,7 +101,39 @@ export type CartOwner = `user:${string}` | `guest:${string}`
 export interface CartRecord {
   owner: CartOwner
   lines: CartLineRecord[]
+  /** Applied coupon; re-validated by every quote. */
+  couponCode: string | null
   updatedAt: string
+}
+
+export interface CouponRecord {
+  code: string
+  /** Summary row label. */
+  label: string
+  /** Percentage in basis points (1000 = 10%) or a fixed ETH amount. */
+  discount:
+    { kind: 'percent'; basisPoints: number } | { kind: 'amount'; eth: string }
+  expiresAt: string
+}
+
+/** Priced snapshot of a cart; orders must reference a fresh one. */
+export interface QuoteRecord {
+  id: string
+  owner: CartOwner
+  createdAt: string
+  expiresAt: string
+  lines: {
+    itemId: string
+    nftId: string
+    editionId: string
+    quantity: number
+    unitPriceEth: string
+  }[]
+  couponCode: string | null
+  subtotalEth: string
+  discountEth: string
+  networkFeeEth: string
+  totalEth: string
 }
 
 export interface MockDatabase {
@@ -114,4 +146,6 @@ export interface MockDatabase {
   nfts: NftRecord[]
   favorites: FavoriteRecord[]
   carts: CartRecord[]
+  coupons: CouponRecord[]
+  quotes: QuoteRecord[]
 }

@@ -2,6 +2,7 @@ import { HttpResponse } from 'msw'
 
 import {
   addCartItemRequestSchema,
+  applyCouponRequestSchema,
   GUEST_CART_HEADER,
   updateCartItemRequestSchema,
 } from '@/contracts/cart'
@@ -10,11 +11,14 @@ import { readBearerToken, requireSession } from '../auth'
 import type { CartOwner } from '../db/schema'
 import {
   addCartItem,
+  applyCoupon,
   CartError,
   guestCart,
   mergeGuestCart,
+  quoteCart,
   readCart,
   removeCartItem,
+  removeCoupon,
   updateCartItem,
   userCart,
 } from '../domain/cart'
@@ -62,12 +66,20 @@ function requireOwner(
 function cartErrorResponse(error: unknown) {
   if (!(error instanceof CartError)) throw error
   const { failure } = error
-  return failure.kind === 'not-found'
-    ? apiError(404, 'NOT_FOUND', { message: failure.message })
-    : apiError(409, 'AVAILABILITY_CONFLICT', {
+  switch (failure.kind) {
+    case 'not-found':
+      return apiError(404, 'NOT_FOUND', { message: failure.message })
+    case 'coupon':
+      return apiError(422, 'VALIDATION_ERROR', {
+        message: failure.message,
+        fields: { code: failure.message },
+      })
+    case 'availability':
+      return apiError(409, 'AVAILABILITY_CONFLICT', {
         message: failure.message,
         details: failure.details,
       })
+  }
 }
 
 export const cartHandlers = [
@@ -78,11 +90,7 @@ export const cartHandlers = [
     ({ request }) => {
       const check = resolveOwner(request)
       if (!check.ok) return check.response
-      return HttpResponse.json(
-        check.owner
-          ? readCart(check.owner)
-          : { items: [], itemCount: 0, subtotalEth: '0', updatedAt: null },
-      )
+      return HttpResponse.json(readCart(check.owner))
     },
   ),
 
@@ -154,6 +162,47 @@ export const cartHandlers = [
               adjustments: [],
             },
       )
+    },
+  ),
+
+  route(
+    'put',
+    '/cart/coupon',
+    { operation: 'cart.coupon.apply', label: 'Cupom (aplicar)' },
+    async ({ request }) => {
+      const check = requireOwner(request)
+      if (!check.ok) return check.response
+      const parsed = applyCouponRequestSchema.safeParse(
+        await readJsonBody(request),
+      )
+      if (!parsed.success) return validationError(parsed.error.issues)
+      try {
+        return HttpResponse.json(applyCoupon(check.owner, parsed.data.code))
+      } catch (error) {
+        return cartErrorResponse(error)
+      }
+    },
+  ),
+
+  route(
+    'delete',
+    '/cart/coupon',
+    { operation: 'cart.coupon.remove', label: 'Cupom (remover)' },
+    ({ request }) => {
+      const check = requireOwner(request)
+      if (!check.ok) return check.response
+      return HttpResponse.json(removeCoupon(check.owner))
+    },
+  ),
+
+  route(
+    'post',
+    '/cart/quote',
+    { operation: 'cart.quote', label: 'Cotação do carrinho' },
+    ({ request }) => {
+      const check = requireOwner(request)
+      if (!check.ok) return check.response
+      return HttpResponse.json(quoteCart(check.owner))
     },
   ),
 ]

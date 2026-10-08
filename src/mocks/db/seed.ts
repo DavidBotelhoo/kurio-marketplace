@@ -1,5 +1,6 @@
 import { cartLineId, maxQuantity } from '../domain/cart-rules'
 import { createCatalogFixtures } from '../fixtures/catalog'
+import { COUPONS } from '../fixtures/coupons'
 import { SEED_DATE, USERS } from '../fixtures/users'
 import {
   type CartRecord,
@@ -38,7 +39,12 @@ function seedCart(nfts: readonly NftRecord[]): CartRecord {
       },
     ]
   })
-  return { owner: 'user:usr_nova', lines, updatedAt: SEED_DATE }
+  return {
+    owner: 'user:usr_nova',
+    lines,
+    couponCode: null,
+    updatedAt: SEED_DATE,
+  }
 }
 
 /** Builds a fresh, deterministic snapshot for a dataset. */
@@ -63,5 +69,7 @@ export function createSeed(dataset: DatasetId): MockDatabase {
             },
           ],
     carts: nfts.length ? [seedCart(nfts)] : [],
+    coupons: structuredClone([...COUPONS]),
+    quotes: [],
   }
 }

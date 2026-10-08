@@ -21,6 +21,14 @@ import { ethAmountSchema, isoDateTimeSchema } from './common'
  * POST   /cart/merge          Bearer + X-Guest-Cart → 200 CartMergeResponse
  *                             (moves the visitor's lines into the collector's
  *                             cart and deletes the visitor cart; idempotent)
+ * PUT    /cart/coupon         ApplyCouponRequest → 200 CartResponse
+ *                             422 VALIDATION_ERROR (fields.code: unknown or
+ *                             expired coupon)
+ * DELETE /cart/coupon         → 200 CartResponse (idempotent)
+ * POST   /cart/quote          → 200 QuoteResponse: prices the current cart
+ *                             (availability, coupon, network fees, total).
+ *                             Orders reference a quote; it expires after
+ *                             QUOTE_TTL_SECONDS or when prices change.
  *
  * 404 NOT_FOUND unknown NFT, edition or line · 422 VALIDATION_ERROR
  * 409 AVAILABILITY_CONFLICT when the edition cannot take the quantity
@@ -65,8 +73,17 @@ export const cartItemSchema = z.object({
 
 export type CartItem = z.infer<typeof cartItemSchema>
 
+export const appliedCouponSchema = z.object({
+  code: z.string(),
+  /** Summary row label, e.g. "Desconto do lançamento". */
+  label: z.string(),
+})
+
+export type AppliedCoupon = z.infer<typeof appliedCouponSchema>
+
 export const cartResponseSchema = z.object({
   items: z.array(cartItemSchema),
+  coupon: z.nullable(appliedCouponSchema),
   /** Units in the cart (header badge). */
   itemCount: z.int(),
   /** Sum of the line totals; the quote adds discounts and fees. */
@@ -105,6 +122,65 @@ export const cartMergeResponseSchema = z.object({
 })
 
 export type CartMergeResponse = z.infer<typeof cartMergeResponseSchema>
+
+export const applyCouponRequestSchema = z.object({
+  code: z
+    .string()
+    .check(
+      z.trim(),
+      z.toUpperCase(),
+      z.minLength(1, 'Informe o código promocional.'),
+      z.maxLength(32, 'Código promocional inválido.'),
+    ),
+})
+
+export type ApplyCouponRequest = z.input<typeof applyCouponRequestSchema>
+
+export const QUOTE_TTL_SECONDS = 600
+
+export const quoteIssueSchema = z.object({
+  code: z.enum(['empty-cart', 'item-unavailable']),
+  message: z.string(),
+  itemId: z.nullable(z.string()),
+})
+
+export type QuoteIssue = z.infer<typeof quoteIssueSchema>
+
+export const quoteResponseSchema = z.object({
+  id: z.string(),
+  createdAt: isoDateTimeSchema,
+  expiresAt: isoDateTimeSchema,
+  /** Priced lines (snapshot used by the order). */
+  items: z.array(
+    z.object({
+      itemId: z.string(),
+      nftId: z.string(),
+      editionId: z.string(),
+      quantity: z.int(),
+      unitPriceEth: ethAmountSchema,
+      lineTotalEth: ethAmountSchema,
+    }),
+  ),
+  subtotalEth: ethAmountSchema,
+  discountEth: ethAmountSchema,
+  /** Estimated fee: one transaction per network in the cart. */
+  networkFeeEth: ethAmountSchema,
+  totalEth: ethAmountSchema,
+  /**
+   * Coupon kept in the cart: "applied", or "expired" when it stopped being
+   * valid after it was applied (no discount).
+   */
+  coupon: z.nullable(
+    z.extend(appliedCouponSchema, {
+      status: z.enum(['applied', 'expired']),
+    }),
+  ),
+  /** Checkout is allowed only when there are no issues. */
+  purchasable: z.boolean(),
+  issues: z.array(quoteIssueSchema),
+})
+
+export type QuoteResponse = z.infer<typeof quoteResponseSchema>
 
 export interface AvailabilityConflictDetails {
   nftId: string
