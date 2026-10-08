@@ -1,4 +1,5 @@
 import { useRouter } from '@tanstack/react-router'
+import type { ReactNode } from 'react'
 
 import { HeartFilledIcon, HeartIcon } from '@/components/icons'
 import type { NftSummary } from '@/contracts/catalog'
@@ -10,6 +11,8 @@ interface FavoriteButtonProps {
   nft: NftSummary
   className?: string
   iconClassName?: string
+  /** Visible text next to the icon (the accessible name stays the same). */
+  children?: ReactNode
 }
 
 /**
@@ -20,6 +23,7 @@ export function FavoriteButton({
   nft,
   className,
   iconClassName,
+  children,
 }: FavoriteButtonProps) {
   const router = useRouter()
   const { signedIn, isFavorite, toggle } = useFavorite(nft)
@@ -47,6 +51,7 @@ export function FavoriteButton({
       className={cn('grid cursor-pointer place-items-center', className)}
     >
       <Icon className={iconClassName} />
+      {children}
     </button>
   )
 }
