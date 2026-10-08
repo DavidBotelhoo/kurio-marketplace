@@ -8,6 +8,9 @@ import { publish } from '../realtime/server'
 
 type Change = NftUpdatedEvent['data']['changes'][number]
 
+/** Per-order limit of limited editions (never above the units left). */
+const LIMITED_MAX_PER_ORDER = 10
+
 function eventId() {
   return crypto.randomUUID()
 }
@@ -88,6 +91,22 @@ export function setEditionAvailability(
     const edition: EditionRecord = resolveEdition(record, editionId)
     if (edition.kind === 'open') throw new Error('Open editions are unlimited')
     edition.available = available
-    edition.maxPerOrder = Math.min(available, 10)
+    edition.maxPerOrder = Math.min(available, LIMITED_MAX_PER_ORDER)
+  })
+}
+
+/** Units sold by a confirmed order; open editions are unlimited. */
+export function sellEditionUnits(
+  nftId: string,
+  editionId: string,
+  quantity: number,
+) {
+  const edition = resolveEdition(findNft(nftId), editionId)
+  if (edition.available === null) return null
+  return mutateNft(nftId, ['availability'], (record) => {
+    const target = resolveEdition(record, editionId)
+    const available = Math.max(0, (target.available ?? 0) - quantity)
+    target.available = available
+    target.maxPerOrder = Math.min(available, LIMITED_MAX_PER_ORDER)
   })
 }

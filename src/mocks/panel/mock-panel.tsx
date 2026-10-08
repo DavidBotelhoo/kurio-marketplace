@@ -19,6 +19,7 @@ import {
 import { DEMO_CREDENTIALS } from '../demo-credentials'
 import { listOperations } from '../operations'
 import { RealtimeSection } from './realtime-section'
+import { OrdersSection } from './orders-section'
 import { SessionSection } from './session-section'
 import { WalletSection } from './wallet-section'
 
@@ -334,6 +335,10 @@ export function MockPanel() {
 
           <Section title="Carteira">
             <WalletSection />
+          </Section>
+
+          <Section title="Pedidos">
+            <OrdersSection />
           </Section>
 
           <Section title="Usuários de teste">

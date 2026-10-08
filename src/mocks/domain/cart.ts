@@ -397,12 +397,17 @@ function issueFor(item: CartItem): QuoteIssue | null {
   }
 }
 
+interface PricedCart {
+  record: Omit<QuoteRecord, 'id' | 'createdAt' | 'expiresAt'>
+  response: Omit<QuoteResponse, 'id' | 'createdAt' | 'expiresAt'>
+}
+
 /**
  * Prices the cart as it is now: line totals, the coupon (re-validated),
  * one estimated network fee per network in the cart, and the issues that
- * block checkout. The snapshot is stored so orders can reference it.
+ * block checkout. Pure: orders use it to check a quote is still current.
  */
-export function quoteCart(owner: CartOwner): QuoteResponse {
+export function priceCart(owner: CartOwner): PricedCart {
   const data = db.read()
   const cart = data.carts.find((item) => item.owner === owner)
   const items = cartItems(cart, data.nfts)
@@ -430,57 +435,67 @@ export function quoteCart(owner: CartOwner): QuoteResponse {
         },
       ]
 
-  const now = Date.now()
-  const record: QuoteRecord = {
-    id: `qt_${crypto.randomUUID()}`,
-    owner,
-    createdAt: new Date(now).toISOString(),
-    expiresAt: new Date(now + QUOTE_TTL_SECONDS * 1000).toISOString(),
-    lines: items.map((item) => ({
-      itemId: item.id,
-      nftId: item.nft.id,
-      editionId: item.edition.id,
-      quantity: item.quantity,
-      unitPriceEth: item.unitPriceEth,
-    })),
-    couponCode: coupon && !couponExpired ? coupon.code : null,
-    subtotalEth,
-    discountEth,
-    networkFeeEth,
-    totalEth,
-  }
-  db.write((draft) => {
-    // Keep only live quotes to bound the stored snapshot.
-    draft.quotes = draft.quotes.filter(
-      (quote) => Date.parse(quote.expiresAt) > now,
-    )
-    draft.quotes.push(record)
-  })
+  const lines = items.map((item) => ({
+    itemId: item.id,
+    nftId: item.nft.id,
+    editionId: item.edition.id,
+    quantity: item.quantity,
+    unitPriceEth: item.unitPriceEth,
+  }))
+  const totals = { subtotalEth, discountEth, networkFeeEth, totalEth }
 
   return {
-    id: record.id,
-    createdAt: record.createdAt,
-    expiresAt: record.expiresAt,
-    items: items.map((item) => ({
-      itemId: item.id,
-      nftId: item.nft.id,
-      editionId: item.edition.id,
-      quantity: item.quantity,
-      unitPriceEth: item.unitPriceEth,
-      lineTotalEth: item.lineTotalEth,
-    })),
-    subtotalEth,
-    discountEth,
-    networkFeeEth,
-    totalEth,
-    coupon: coupon
-      ? {
-          code: coupon.code,
-          label: coupon.label,
-          status: couponExpired ? 'expired' : 'applied',
-        }
-      : null,
-    purchasable: issues.length === 0,
-    issues,
+    record: {
+      owner,
+      lines,
+      couponCode: coupon && !couponExpired ? coupon.code : null,
+      ...totals,
+      orderId: null,
+    },
+    response: {
+      items: items.map((item) => ({
+        itemId: item.id,
+        nftId: item.nft.id,
+        editionId: item.edition.id,
+        quantity: item.quantity,
+        unitPriceEth: item.unitPriceEth,
+        lineTotalEth: item.lineTotalEth,
+      })),
+      ...totals,
+      coupon: coupon
+        ? {
+            code: coupon.code,
+            label: coupon.label,
+            status: couponExpired ? 'expired' : 'applied',
+          }
+        : null,
+      purchasable: issues.length === 0,
+      issues,
+    },
+  }
+}
+
+/** Prices the cart and stores the snapshot so an order can reference it. */
+export function quoteCart(owner: CartOwner): QuoteResponse {
+  const { record, response } = priceCart(owner)
+  const now = Date.now()
+  const stored: QuoteRecord = {
+    ...record,
+    id: `qt_${crypto.randomUUID()}`,
+    createdAt: new Date(now).toISOString(),
+    expiresAt: new Date(now + QUOTE_TTL_SECONDS * 1000).toISOString(),
+  }
+  db.write((draft) => {
+    // Keep live quotes (and the ones orders point to) to bound the snapshot.
+    draft.quotes = draft.quotes.filter(
+      (quote) => quote.orderId !== null || Date.parse(quote.expiresAt) > now,
+    )
+    draft.quotes.push(stored)
+  })
+  return {
+    ...response,
+    id: stored.id,
+    createdAt: stored.createdAt,
+    expiresAt: stored.expiresAt,
   }
 }

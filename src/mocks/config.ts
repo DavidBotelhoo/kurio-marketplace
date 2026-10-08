@@ -64,6 +64,10 @@ export const mockConfigSchema = z.object({
   panel: z.boolean(),
   /** Answer of the simulated wallet extension to connection prompts. */
   walletApproval: z.enum(['approve', 'reject']),
+  /** Result of new orders' payments. */
+  paymentOutcome: z.enum(['confirm', 'decline']),
+  /** Time a new order stays pending before it is confirmed or rejected. */
+  settlementSeconds: z.int().check(z.positive()),
 })
 
 export type MockConfig = z.infer<typeof mockConfigSchema>
@@ -78,6 +82,8 @@ export const DEFAULT_CONFIG: MockConfig = {
   sessionTtlSeconds: 8 * 60 * 60,
   panel: true,
   walletApproval: 'approve',
+  paymentOutcome: 'confirm',
+  settlementSeconds: 3,
 }
 
 interface ScenarioPreset {
@@ -147,6 +153,34 @@ export const SCENARIO_PRESETS = {
     description:
       'A extensão simulada recusa os pedidos de conexão até o cenário mudar.',
     config: { walletApproval: 'reject' },
+  },
+  'payment-declined': {
+    label: 'Pagamento recusado',
+    description:
+      'Novos pedidos ficam pendentes e são recusados; o carrinho é preservado.',
+    config: { paymentOutcome: 'decline' },
+  },
+  'order-timeout': {
+    label: 'Timeout após criar o pedido',
+    description:
+      'O primeiro pedido é criado, mas a resposta se perde (timeout); o reenvio com a mesma chave recupera o mesmo pedido.',
+    config: {
+      failures: [
+        {
+          id: 'preset-order-timeout',
+          operation: 'orders.create',
+          kind: 'timeout',
+          phase: 'after',
+          remaining: 1,
+        },
+      ],
+    },
+  },
+  'slow-settlement': {
+    label: 'Pagamento demorado',
+    description:
+      'Pedidos ficam pendentes por 30 s: dá para recarregar a página ou derrubar a conexão e retomar.',
+    config: { settlementSeconds: 30 },
   },
   'server-errors': {
     label: 'Erros no servidor',

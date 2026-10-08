@@ -37,6 +37,17 @@ interface Connection {
 }
 
 const connections = new Map<string, Connection>()
+
+type TopicGuard = (token: string | null, topic: string) => boolean
+let topicGuard: TopicGuard = () => true
+
+/**
+ * Decides which topics a connection may join (private topics such as
+ * order:<id> belong to one collector). Registered by the domain layer.
+ */
+export function setTopicGuard(guard: TopicGuard) {
+  topicGuard = guard
+}
 const eventLog: { topic: string; event: RealtimeEvent }[] = []
 
 type ConnectionListener = (count: number) => void
@@ -96,7 +107,9 @@ export function handleConnection(connection: WebSocketHandlerConnection) {
   })
 
   io.client.on(SUBSCRIBE, (_event, value: unknown) => {
-    for (const topic of readTopics(value)) entry.topics.add(topic)
+    for (const topic of readTopics(value)) {
+      if (topicGuard(entry.token, topic)) entry.topics.add(topic)
+    }
   })
 
   io.client.on(UNSUBSCRIBE, (_event, value: unknown) => {
@@ -164,6 +177,11 @@ export function connectionCount() {
 
 export function connectionTokens() {
   return [...connections.values()].map((connection) => connection.token)
+}
+
+/** Topics joined by each open connection (tests: private topic guard). */
+export function connectionTopics() {
+  return [...connections.values()].map((connection) => [...connection.topics])
 }
 
 export function subscribeConnections(listener: ConnectionListener) {

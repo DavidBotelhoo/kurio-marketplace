@@ -15,6 +15,7 @@ import {
 import { activeSessionCount, expireAllSessions } from './auth'
 import { db } from './db/database'
 import { expireCoupon } from './domain/cart'
+import { settleDueOrders, startOrderScheduler } from './domain/orders'
 import { disconnectAllWallets } from './domain/wallets'
 import { changeNftPrice, setEditionAvailability } from './domain/catalog'
 import type { MockDatabase } from './db/schema'
@@ -24,6 +25,7 @@ import {
   clearEventLog,
   connectionCount,
   connectionTokens,
+  connectionTopics,
   disconnectAll,
   resendLastEvent,
   sendStaleEvent,
@@ -84,6 +86,10 @@ export interface KurioMocksApi {
     /** Makes a coupon expire now (applied coupons stop discounting). */
     expire: typeof expireCoupon
   }
+  orders: {
+    /** Settles every pending order now, ignoring the pending time. */
+    settleNow: () => Promise<void>
+  }
   wallets: {
     /** Answer of the simulated extension to the next connection prompts. */
     setApproval: (mode: MockConfig['walletApproval']) => void
@@ -100,6 +106,8 @@ export interface KurioMocksApi {
     connections: () => number
     /** Session token sent by each open connection (null for visitors). */
     connectionTokens: () => (string | null)[]
+    /** Topics joined by each open connection. */
+    connectionTopics: () => string[][]
   }
 }
 
@@ -127,6 +135,8 @@ export async function startMocks(overrides: MockUrlOverrides) {
       if (new URL(request.url).pathname.startsWith(env.apiUrl)) print.warning()
     },
   })
+  // Pending orders keep settling while the app is open (and after reloads).
+  startOrderScheduler()
 
   window.__kurioMocks = {
     getConfig: getMockConfig,
@@ -141,6 +151,9 @@ export async function startMocks(overrides: MockUrlOverrides) {
       activeSessions: activeSessionCount,
     },
     coupons: { expire: expireCoupon },
+    orders: {
+      settleNow: () => settleDueOrders({ force: true }),
+    },
     wallets: {
       setApproval: (mode) => {
         updateMockConfig({ walletApproval: mode })
@@ -157,6 +170,7 @@ export async function startMocks(overrides: MockUrlOverrides) {
       },
       connections: connectionCount,
       connectionTokens,
+      connectionTopics,
     },
   }
 

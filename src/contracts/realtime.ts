@@ -2,6 +2,7 @@ import * as z from 'zod/mini'
 
 import { availabilitySchema, editionSchema } from './catalog'
 import { ethAmountSchema, isoDateTimeSchema } from './common'
+import { orderSchema } from './orders'
 
 /**
  * Realtime contract (Socket.IO, default namespace).
@@ -41,8 +42,19 @@ export const nftUpdatedEventSchema = z.object({
 
 export type NftUpdatedEvent = z.infer<typeof nftUpdatedEventSchema>
 
+export const orderUpdatedEventSchema = z.object({
+  ...envelope,
+  type: z.literal('order.updated'),
+  resource: z.object({ type: z.literal('order'), id: z.string() }),
+  /** The full order (state, not a delta). */
+  data: orderSchema,
+})
+
+export type OrderUpdatedEvent = z.infer<typeof orderUpdatedEventSchema>
+
 export const realtimeEventSchemas = {
   'nft.updated': nftUpdatedEventSchema,
+  'order.updated': orderUpdatedEventSchema,
 } as const
 
 export type RealtimeEventType = keyof typeof realtimeEventSchemas

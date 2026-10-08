@@ -64,6 +64,14 @@ export const db = {
     return result
   },
 
+  /**
+   * Drops the in-memory copy so the next read loads the persisted snapshot
+   * (another tab may have written it). Used inside cross-tab locks.
+   */
+  refresh() {
+    state = null
+  },
+
   /** Restores the seeded snapshot of the active dataset. */
   reset() {
     state = createSeed(dataset)

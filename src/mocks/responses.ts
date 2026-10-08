@@ -12,6 +12,11 @@ const MESSAGES: Record<ApiErrorCode, string> = {
   CONFLICT: 'Os dados mudaram desde a última consulta.',
   AVAILABILITY_CONFLICT: 'Quantidade indisponível para esta edição.',
   WALLET_REJECTED: 'A conexão foi recusada na carteira.',
+  WALLET_DISCONNECTED:
+    'Sua carteira foi desconectada. Conecte novamente para continuar.',
+  QUOTE_OUTDATED: 'Os valores do pedido mudaram. Revise antes de confirmar.',
+  IDEMPOTENCY_CONFLICT:
+    'Esta tentativa de compra já foi usada com outros dados.',
   RATE_LIMITED: 'Muitas tentativas. Aguarde um instante e tente novamente.',
   SERVER_ERROR: 'Erro interno do servidor.',
   SERVICE_UNAVAILABLE: 'Serviço temporariamente indisponível.',

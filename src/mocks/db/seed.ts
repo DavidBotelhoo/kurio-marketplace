@@ -74,5 +74,6 @@ export function createSeed(dataset: DatasetId): MockDatabase {
     quotes: [],
     wallets: structuredClone([...WALLETS]),
     walletConnections: [],
+    orders: [],
   }
 }

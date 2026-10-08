@@ -1,4 +1,5 @@
 import type { CategoryId, NetworkId } from '@/contracts/catalog'
+import type { Order } from '@/contracts/orders'
 import type { WalletProviderId, WalletSlot } from '@/contracts/wallet-providers'
 
 /*
@@ -7,7 +8,7 @@ import type { WalletProviderId, WalletSlot } from '@/contracts/wallet-providers'
  */
 
 /** Bump whenever record shapes change; stale snapshots are reseeded. */
-export const DB_VERSION = 8
+export const DB_VERSION = 9
 
 /**
  * Seed variants: "default" is the full catalog; "empty-catalog" keeps users
@@ -135,6 +136,8 @@ export interface QuoteRecord {
   discountEth: string
   networkFeeEth: string
   totalEth: string
+  /** Order created from this quote (a quote buys once). */
+  orderId: string | null
 }
 
 export interface WalletRecord {
@@ -169,6 +172,18 @@ export interface WalletConnectionRecord {
   revokedAt: string | null
 }
 
+export interface OrderRecord extends Order {
+  userId: string
+  quoteId: string
+  connectionId: string
+  idempotencyKey: string
+  /** Stable hash of the request body (same key + other body = conflict). */
+  requestHash: string
+  /** Payment outcome drawn at creation and when it becomes final. */
+  outcome: 'confirm' | 'decline'
+  settlesAt: string
+}
+
 export interface MockDatabase {
   /** Bumped whenever the record shapes change; older snapshots are reseeded. */
   version: number
@@ -183,4 +198,5 @@ export interface MockDatabase {
   quotes: QuoteRecord[]
   wallets: WalletRecord[]
   walletConnections: WalletConnectionRecord[]
+  orders: OrderRecord[]
 }
