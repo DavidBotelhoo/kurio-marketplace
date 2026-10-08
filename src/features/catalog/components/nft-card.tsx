@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { SearchIcon } from '@/components/icons'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { NftSummary } from '@/contracts/catalog'
+import { QuickAddButton } from '@/features/cart/components/quick-add-button'
 import { FavoriteButton } from '@/features/favorites/components/favorite-button'
 import { cn } from '@/lib/utils'
 
@@ -22,6 +23,9 @@ export const CARD_IMAGE_SIZES =
 interface NftCardProps {
   nft: NftSummary
   priority?: boolean
+  /** Smaller texts (Figma "Mais desta coleção" cards). */
+  compact?: boolean
+  imageSizes?: string
 }
 
 /*
@@ -30,7 +34,12 @@ interface NftCardProps {
  * centered 250px image; the actions appear on hover or keyboard focus (always
  * on touch screens). Actions are siblings of the link: no buttons inside <a>.
  */
-export function NftCard({ nft, priority = false }: NftCardProps) {
+export function NftCard({
+  nft,
+  priority = false,
+  compact = false,
+  imageSizes = CARD_IMAGE_SIZES,
+}: NftCardProps) {
   const updated = useChangedFlag(nft.version)
   const soldOut = nft.availability === 'sold-out'
   const rarity = nft.rarity === 'comum' ? null : RARITY_LABEL[nft.rarity]
@@ -45,7 +54,7 @@ export function NftCard({ nft, priority = false }: NftCardProps) {
         <div className="relative grid aspect-[175/200] place-items-center overflow-hidden rounded-[1.25rem] bg-linear-to-b from-card to-muted md:aspect-[258/300] md:rounded-none md:bg-card md:from-card md:to-card md:group-focus-within:shadow-[inset_0_1px_0_var(--color-primary)] md:group-hover:shadow-[inset_0_1px_0_var(--color-primary)]">
           <NftImage
             image={nft.image}
-            sizes={CARD_IMAGE_SIZES}
+            sizes={imageSizes}
             priority={priority}
             className={cn(
               'aspect-square w-[96%] rounded-[1rem] object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transition-none md:w-[97%] md:rounded-[0.9375rem]',
@@ -63,11 +72,21 @@ export function NftCard({ nft, priority = false }: NftCardProps) {
             </span>
           ) : null}
         </div>
-        <h3 className="mt-2 line-clamp-2 px-2 text-15 text-foreground md:mt-3 md:px-0 md:text-16">
+        <h3
+          className={cn(
+            'mt-2 line-clamp-2 px-2 text-15 text-foreground md:mt-3 md:px-0',
+            !compact && 'md:text-16',
+          )}
+        >
           {nft.name}
         </h3>
       </Link>
       <div className="pointer-events-none absolute top-3 right-2.5 flex gap-[0.6875rem] transition-opacity motion-reduce:transition-none md:top-0 md:right-0 md:left-0 md:aspect-[258/300] md:items-end md:justify-center md:pb-[2.9%] md:group-focus-within:opacity-100 md:pointer-fine:opacity-0 md:pointer-fine:group-hover:opacity-100">
+        <QuickAddButton
+          nft={nft}
+          className={cn(cardActionClass, 'hidden md:grid')}
+          iconClassName="size-5"
+        />
         <FavoriteButton
           nft={nft}
           className={cardActionClass}
@@ -86,7 +105,8 @@ export function NftCard({ nft, priority = false }: NftCardProps) {
       </div>
       <p
         className={cn(
-          'mt-0.5 px-2 text-16 transition-colors md:mt-1.5 md:px-0 md:text-18',
+          'mt-0.5 px-2 text-16 transition-colors md:mt-1.5 md:px-0',
+          !compact && 'md:text-18',
           updated &&
             'animate-pulse rounded-sm bg-primary/15 motion-reduce:animate-none',
         )}
