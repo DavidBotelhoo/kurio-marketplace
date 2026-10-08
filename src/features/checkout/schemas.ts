@@ -1,22 +1,12 @@
 import * as z from 'zod/mini'
 
 import type { User } from '@/contracts/auth'
-import { NETWORKS, type NetworkId } from '@/contracts/catalog-taxonomy'
 import {
   type CreateOrderRequest,
   createOrderRequestSchema,
 } from '@/contracts/orders'
-import {
-  WALLET_PROVIDERS,
-  type WalletProviderId,
-} from '@/contracts/wallet-providers'
 import { type Wallet, walletFieldsSchema } from '@/contracts/wallets'
-
-const isNetwork = (value: string): value is NetworkId =>
-  NETWORKS.some((network) => network.id === value)
-
-const isProvider = (value: string): value is WalletProviderId =>
-  WALLET_PROVIDERS.some((provider) => provider.id === value)
+import { isNetwork, isProvider } from '@/features/wallets/schemas'
 
 const fields = walletFieldsSchema.shape
 const collector = createOrderRequestSchema.shape.collector.shape
