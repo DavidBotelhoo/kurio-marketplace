@@ -3,7 +3,9 @@ import { Tabs } from 'radix-ui'
 import { NETWORKS, type NftDetail } from '@/contracts/catalog'
 import { cn } from '@/lib/utils'
 
-import { formatRating, reviewsLabel, shortAddress } from '../format'
+import { shortAddress } from '@/lib/address'
+
+import { formatRating, reviewsLabel } from '../format'
 import { Stars } from './rating'
 
 const triggerClass =
