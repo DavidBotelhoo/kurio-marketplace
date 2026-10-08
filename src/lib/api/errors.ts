@@ -5,7 +5,8 @@ import { type ApiErrorCode, isApiErrorBody } from '@/contracts/errors'
 /** Errors produced on the client side, without a server response. */
 export type TransportErrorCode = 'NETWORK_ERROR' | 'TIMEOUT' | 'CANCELED'
 
-export type ClientErrorCode = ApiErrorCode | TransportErrorCode | 'UNKNOWN'
+export type ClientErrorCode =
+  ApiErrorCode | TransportErrorCode | 'INVALID_RESPONSE' | 'UNKNOWN'
 
 const DEFAULT_MESSAGES: Record<ClientErrorCode, string> = {
   VALIDATION_ERROR: 'Confira os dados informados.',
@@ -21,6 +22,7 @@ const DEFAULT_MESSAGES: Record<ClientErrorCode, string> = {
   NETWORK_ERROR: 'Sem conexão com o servidor. Verifique sua internet.',
   TIMEOUT: 'O servidor demorou para responder. Tente novamente.',
   CANCELED: 'A requisição foi cancelada.',
+  INVALID_RESPONSE: 'Recebemos uma resposta inesperada do servidor.',
   UNKNOWN: 'Algo deu errado. Tente novamente.',
 }
 

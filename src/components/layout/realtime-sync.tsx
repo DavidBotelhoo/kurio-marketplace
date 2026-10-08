@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 
+import { useSessionToken } from '@/features/auth/queries'
 import { applyNftUpdated } from '@/features/catalog/realtime'
 import { realtime } from '@/lib/realtime/client'
 
@@ -14,8 +15,15 @@ const RESTORED_NOTICE_MS = 3_000
 export function RealtimeSync() {
   const queryClient = useQueryClient()
 
+  const token = useSessionToken()
+
+  // One socket per session: a new token (login, logout, other user) replaces
+  // the connection, so events of the previous session cannot leak.
   useEffect(() => {
-    realtime.connect(null)
+    realtime.connect(token)
+  }, [token])
+
+  useEffect(() => {
     const offNftUpdated = realtime.on('nft.updated', (event) => {
       applyNftUpdated(queryClient, event)
     })

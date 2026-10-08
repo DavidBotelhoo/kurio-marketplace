@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import { App } from './app'
+import { installSessionLifecycle } from './features/auth/session-lifecycle'
 import { setRequestGate } from './lib/api/request-gate'
 import { env } from './lib/env'
 import { createQueryClient } from './lib/query-client'
@@ -28,6 +29,7 @@ if (env.enableMocks) {
 
 const queryClient = createQueryClient()
 const router = createAppRouter({ queryClient })
+installSessionLifecycle(router, queryClient)
 
 createRoot(rootElement).render(
   <StrictMode>

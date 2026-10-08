@@ -1,8 +1,8 @@
 import { Link, useLocation } from '@tanstack/react-router'
 
-import { CartIcon, LoginIcon, SearchIcon } from '@/components/icons'
-import { Button } from '@/components/ui/button'
+import { CartIcon, SearchIcon } from '@/components/icons'
 import { UnavailableAction } from '@/components/unavailable-action'
+import { AccountActions } from '@/features/auth/components/account-actions'
 import { cn } from '@/lib/utils'
 
 /** Catalog anchor on the home page; "Mercado" scrolls to it. */
@@ -86,16 +86,7 @@ function HeaderActions() {
       >
         <CartIcon className="size-6" />
       </Link>
-      <Button
-        asChild
-        size="sm"
-        className="h-[2.1875rem] gap-1.5 px-2.5 text-16 font-medium"
-      >
-        <Link to="/login">
-          <LoginIcon className="size-4" />
-          Entrar
-        </Link>
-      </Button>
+      <AccountActions />
     </div>
   )
 }

@@ -2,6 +2,7 @@ import axios, { type InternalAxiosRequestConfig, isAxiosError } from 'axios'
 
 import { env } from '@/lib/env'
 
+import { getAuthToken, notifyUnauthorized } from './auth-token'
 import { ApiError, toApiError } from './errors'
 import { waitForRequestGate } from './request-gate'
 
@@ -40,8 +41,15 @@ export const api = axios.create({
   paramsSerializer: { indexes: null },
 })
 
+const sentTokens = new WeakMap<InternalAxiosRequestConfig, string>()
+
 api.interceptors.request.use(async (config) => {
   await waitForRequestGate()
+  const token = getAuthToken()
+  if (token && !config.headers.has('Authorization')) {
+    config.headers.set('Authorization', `Bearer ${token}`)
+    sentTokens.set(config, token)
+  }
   const controller = new AbortController()
   const state: TimeoutState = {
     timedOut: false,
@@ -64,13 +72,16 @@ api.interceptors.response.use(
     return response
   },
   (error: unknown) => {
-    const state = clearTimeoutFor(
-      isAxiosError(error) ? error.config : undefined,
-    )
-    return Promise.reject(
-      state?.timedOut
-        ? new ApiError({ code: 'TIMEOUT', cause: error })
-        : toApiError(error),
-    )
+    const config = isAxiosError(error) ? error.config : undefined
+    const state = clearTimeoutFor(config)
+    const apiError = state?.timedOut
+      ? new ApiError({ code: 'TIMEOUT', cause: error })
+      : toApiError(error)
+    // An authenticated request was rejected: let the session decide whether
+    // it is still the current one (it may have changed meanwhile).
+    const token = config ? sentTokens.get(config) : undefined
+    if (token && apiError.status === 401)
+      notifyUnauthorized(token, apiError.code)
+    return Promise.reject(apiError)
   },
 )

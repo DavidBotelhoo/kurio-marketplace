@@ -21,6 +21,7 @@ import { resetRequestCounters } from './network'
 import {
   clearEventLog,
   connectionCount,
+  connectionTokens,
   disconnectAll,
   resendLastEvent,
   sendStaleEvent,
@@ -85,6 +86,8 @@ export interface KurioMocksApi {
     sendStale: typeof sendStaleEvent
     disconnectAll: () => void
     connections: () => number
+    /** Session token sent by each open connection (null for visitors). */
+    connectionTokens: () => (string | null)[]
   }
 }
 
@@ -134,6 +137,7 @@ export async function startMocks(overrides: MockUrlOverrides) {
         disconnectAll()
       },
       connections: connectionCount,
+      connectionTokens,
     },
   }
 
