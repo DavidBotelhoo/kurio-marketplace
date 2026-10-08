@@ -15,16 +15,19 @@ if (!rootElement) throw new Error('Root element #root not found')
 
 if (env.enableMocks) {
   // Runs before the router reads the URL; the heavy mock layer loads in
-  // parallel with the first render and API calls wait for it.
+  // parallel with the first render and API calls wait for it. Afterwards,
+  // each call first checks that the worker still intercepts this tab.
   const overrides = captureMockUrlOverrides()
-  const ready = import('./mocks/browser').then(({ startMocks }) =>
-    startMocks(overrides),
-  )
-  setRequestGate(
-    ready.catch((error: unknown) => {
+  const ready = import('./mocks/browser')
+    .then(async ({ startMocks, ensureMockClient }) => {
+      await startMocks(overrides)
+      return ensureMockClient
+    })
+    .catch((error: unknown) => {
       console.error('Não foi possível iniciar a API simulada.', error)
-    }),
-  )
+      return null
+    })
+  setRequestGate(() => ready.then((ensureMockClient) => ensureMockClient?.()))
 }
 
 const queryClient = createQueryClient()

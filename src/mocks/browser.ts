@@ -36,6 +36,59 @@ import type { MockUrlOverrides } from './url-overrides'
 
 export const worker = setupWorker(...handlers)
 
+/** How long a confirmation that the worker mocks this tab is trusted. */
+const CLIENT_CHECK_MS = 5_000
+/** Answer time limit; past it the request goes on as it would anyway. */
+const CLIENT_CHECK_TIMEOUT_MS = 2_000
+
+let clientConfirmedAt = 0
+let clientCheck: Promise<void> | null = null
+
+function isMockingEnabledMessage(data: unknown) {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'type' in data &&
+    data.type === 'MOCKING_ENABLED'
+  )
+}
+
+/** Sends MSW's own activation message and waits for the worker's answer. */
+async function announceClient() {
+  const container = navigator.serviceWorker
+  const target = container.controller ?? (await container.ready).active
+  if (!target) return
+  await new Promise<void>((resolve) => {
+    const finish = () => {
+      clearTimeout(timer)
+      container.removeEventListener('message', onMessage)
+      resolve()
+    }
+    const onMessage = (event: MessageEvent) => {
+      if (isMockingEnabledMessage(event.data)) finish()
+    }
+    const timer = setTimeout(finish, CLIENT_CHECK_TIMEOUT_MS)
+    container.addEventListener('message', onMessage)
+    target.postMessage('MOCK_ACTIVATE')
+  })
+  clientConfirmedAt = Date.now()
+}
+
+/**
+ * Runs before every API request. Browsers stop idle service workers (a tab
+ * left in the background, for instance), and a restarted MSW worker no longer
+ * knows which tabs activated it: it lets their requests through to the
+ * network, where the static host answers index.html. When the last
+ * confirmation is old, this tab announces itself again (no reload needed).
+ */
+export function ensureMockClient(): Promise<void> {
+  if (Date.now() - clientConfirmedAt < CLIENT_CHECK_MS) return Promise.resolve()
+  clientCheck ??= announceClient().finally(() => {
+    clientCheck = null
+  })
+  return clientCheck
+}
+
 /** Applies a named scenario; a different dataset reseeds the database. */
 export function applyPreset(id: PresetId) {
   const previous = getMockConfig()
@@ -134,6 +187,11 @@ export async function startMocks(overrides: MockUrlOverrides) {
       // Only API calls are expected to be mocked; assets go to the network.
       if (new URL(request.url).pathname.startsWith(env.apiUrl)) print.warning()
     },
+  })
+  clientConfirmedAt = Date.now()
+  // A hidden tab is where the worker gets stopped: check again on return.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') clientConfirmedAt = 0
   })
   // Pending orders keep settling while the app is open (and after reloads).
   startOrderScheduler()
