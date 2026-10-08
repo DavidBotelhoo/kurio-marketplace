@@ -1,10 +1,12 @@
+import type { CategoryId, NetworkId } from '@/contracts/catalog'
+
 /*
  * Records persisted by the mock database. They model what a backend would
  * store (internal fields included); handlers map them to the public contracts.
  */
 
 /** Bump whenever record shapes change; stale snapshots are reseeded. */
-export const DB_VERSION = 1
+export const DB_VERSION = 2
 
 /**
  * Seed variants: "default" is the full catalog; "empty-catalog" keeps users
@@ -27,10 +29,48 @@ export interface UserRecord {
   updatedAt: string
 }
 
+export type ArtworkId = 'emerald' | 'nomad' | 'ivory' | 'golden'
+
+export interface EditionRecord {
+  id: string
+  label: string
+  kind: 'limited' | 'open'
+  supply: number | null
+  /** Units left; null for open editions (unlimited). */
+  available: number | null
+  maxPerOrder: number
+  priceEth: string
+}
+
+export interface NftRecord {
+  id: string
+  name: string
+  tokenId: string
+  artwork: ArtworkId
+  collectionId: string
+  category: CategoryId
+  network: NetworkId
+  compareAtPriceEth: string | null
+  rarity: 'comum' | 'raro' | 'lendario'
+  isNew: boolean
+  isTrending: boolean
+  popularity: number
+  listedAt: string
+  rating: { average: number; count: number }
+  attributes: string[]
+  contractAddress: string
+  editions: EditionRecord[]
+  defaultEditionId: string
+  /** Incremented on every change to price or availability. */
+  version: number
+  updatedAt: string
+}
+
 export interface MockDatabase {
   /** Bumped whenever the record shapes change; older snapshots are reseeded. */
   version: number
   dataset: DatasetId
   seededAt: string
   users: UserRecord[]
+  nfts: NftRecord[]
 }

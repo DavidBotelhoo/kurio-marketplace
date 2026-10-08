@@ -1,3 +1,4 @@
+import { createCatalogFixtures } from '../fixtures/catalog'
 import { SEED_DATE, USERS } from '../fixtures/users'
 import { type DatasetId, DB_VERSION, type MockDatabase } from './schema'
 
@@ -8,5 +9,6 @@ export function createSeed(dataset: DatasetId): MockDatabase {
     dataset,
     seededAt: SEED_DATE,
     users: structuredClone([...USERS]),
+    nfts: dataset === 'empty-catalog' ? [] : createCatalogFixtures(),
   }
 }

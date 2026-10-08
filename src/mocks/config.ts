@@ -109,6 +109,27 @@ export const SCENARIO_PRESETS = {
     description: 'Todas as requisições falham por falta de conexão.',
     config: { offline: true },
   },
+  'empty-catalog': {
+    label: 'Catálogo vazio',
+    description: 'Nenhum NFT cadastrado: buscas e destaques retornam vazio.',
+    config: { dataset: 'empty-catalog' },
+  },
+  'catalog-error': {
+    label: 'Falha no catálogo',
+    description:
+      'A listagem responde HTTP 500 nas 3 primeiras tentativas (vencendo os retries automáticos) e se recupera na nova tentativa do usuário.',
+    config: {
+      failures: [
+        {
+          id: 'preset-catalog-error',
+          operation: 'nfts.list',
+          kind: 'server-error',
+          phase: 'before',
+          remaining: 3,
+        },
+      ],
+    },
+  },
   'server-errors': {
     label: 'Erros no servidor',
     description: 'Todas as requisições respondem HTTP 500 até o cenário mudar.',

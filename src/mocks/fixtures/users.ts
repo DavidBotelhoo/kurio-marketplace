@@ -11,8 +11,8 @@ export const USERS: readonly UserRecord[] = [
   {
     id: 'usr_nova',
     email: 'nova@kurio.dev',
-    username: 'nova.sato',
-    displayName: 'Nova Sato',
+    username: 'nova.ribeiro',
+    displayName: 'Nova Ribeiro',
     ensName: 'nova.kurio',
     walletNickname: 'Principal',
     avatarUrl: null,
