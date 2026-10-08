@@ -1,22 +1,32 @@
 import { useQuery } from '@tanstack/react-query'
-import { getRouteApi } from '@tanstack/react-router'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useCallback, useOptimistic, useTransition } from 'react'
 
 import { nftListQueryOptions } from '../queries'
-import { type CatalogSearch, toListParams } from '../search'
+import {
+  type CatalogSearch,
+  toListParams,
+  validateCatalogSearch,
+} from '../search'
 
-const route = getRouteApi('/')
+const DEFAULT_SEARCH = validateCatalogSearch({})
 
-export function useCatalogSearch() {
-  return route.useSearch()
+/**
+ * Catalog state from the home URL. The home page is also rendered outside
+ * its route (behind the desktop login modal); there it shows the default
+ * catalog instead of failing for lack of an active "/" match.
+ */
+export function useCatalogSearch(): CatalogSearch {
+  return useSearch({ from: '/', shouldThrow: false }) ?? DEFAULT_SEARCH
 }
 
 /** Navigates to a new catalog state without jumping to the top of the page. */
 export function useCatalogNavigate() {
-  const navigate = route.useNavigate()
+  const navigate = useNavigate()
   return useCallback(
     (search: CatalogSearch, options: { replace?: boolean } = {}) => {
       void navigate({
+        to: '/',
         search,
         resetScroll: false,
         replace: options.replace ?? false,
@@ -33,14 +43,14 @@ export function useCatalogNavigate() {
  */
 export function useOptimisticCatalog() {
   const search = useCatalogSearch()
-  const navigate = route.useNavigate()
+  const navigate = useNavigate()
   const [optimistic, setOptimistic] = useOptimistic(search)
   const [, startTransition] = useTransition()
   const update = useCallback(
     (next: CatalogSearch) => {
       startTransition(async () => {
         setOptimistic(next)
-        await navigate({ search: next, resetScroll: false })
+        await navigate({ to: '/', search: next, resetScroll: false })
       })
     },
     [navigate, setOptimistic],

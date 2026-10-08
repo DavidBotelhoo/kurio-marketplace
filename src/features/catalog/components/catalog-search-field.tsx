@@ -22,7 +22,9 @@ export function CatalogSearchField({ className }: { className?: string }) {
   const search = useCatalogSearch()
   const navigateCatalog = useCatalogNavigate()
   const router = useRouter()
-  const location = useLocation()
+  const wantsFocus = useLocation({
+    select: (location) => location.state.focusSearch === true,
+  })
   const id = useId()
   const inputRef = useRef<HTMLInputElement>(null)
   const [value, setValue] = useState(search.q ?? '')
@@ -64,7 +66,6 @@ export function CatalogSearchField({ className }: { className?: string }) {
   }, [value, navigateCatalog])
 
   // The header search button navigates here asking for focus.
-  const wantsFocus = location.state.focusSearch === true
   useEffect(() => {
     if (wantsFocus) inputRef.current?.focus()
   }, [wantsFocus])
