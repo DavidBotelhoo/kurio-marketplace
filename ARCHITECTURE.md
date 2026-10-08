@@ -181,6 +181,7 @@ Configuração em `src/lib/query-client.ts`:
 - **Domínio único:** catálogo, favoritos, carrinho, cotação, perfil, carteiras e pedidos compartilham um banco em memória, persistido em `localStorage` e semeado de fixtures determinísticas: 36 NFTs, 8 categorias, 3 redes, 4 tipos de edição, 2 usuários, 3 cupons. As mudanças feitas pelo painel ou pelo domínio (preço, estoque, liquidação de pedido) passam pela mesma camada que responde ao REST e publica os eventos.
 - **Cenários e reset:** cenários pré-definidos (`src/mocks/config.ts`), seleção pelo painel ou por `?mock-scenario=`, e reset que restaura o banco semeado e limpa todas as chaves `kurio.*` do app. Lista completa no [README](README.md#api-simulada-cenários-e-reset).
 - **Senhas:** hash PBKDF2-SHA256 (Web Crypto) com sal, nas fixtures e no banco persistido.
+- **Service worker reiniciado:** o navegador encerra service workers ociosos (por exemplo, numa aba em segundo plano), e o worker do MSW reiniciado não sabe mais quais abas o ativaram, deixando as requisições irem para a rede, onde o host estático responde `index.html`. Antes de cada requisição, o request gate confirma que o worker ainda atende a aba; se a última confirmação tem mais de 5 s ou a aba ficou oculta, ela se anuncia de novo com a mensagem `MOCK_ACTIVATE` do próprio MSW e espera a resposta, sem recarregar a página.
 
 ## Acessibilidade
 
@@ -196,6 +197,7 @@ Configuração em `src/lib/query-client.ts`:
 Ajustes em relação ao layout:
 
 - Pontos de paginação do carrossel com 12 px de espaço (Figma: 8 px), para que os centros fiquem a 24 px (WCAG 2.5.8).
+- Pontos do hero com 24 px entre centros (Figma: 16 px), pelo mesmo motivo; o grupo fica centrado na posição do Figma.
 - Pontos da galeria mobile são indicador de posição, não botões: com 7 px e 7 px de espaço não atingem o tamanho mínimo de alvo. As vistas mudam por swipe ou pelas setas, com a galeria focada.
 - Bordas dos campos mantidas com a cor do Figma (contraste ~1,34:1 com o fundo). Os campos são identificados pelo label e pelo placeholder, e foco e erro usam bordas de alto contraste.
 
@@ -206,6 +208,7 @@ Ajustes em relação ao layout:
 - Filtros ativos aparecem como chips removíveis acima dos resultados (não estão no Figma), com "Limpar filtros".
 - O "NFT em destaque" exibe nome e preço sobre a arte (não estão no Figma): sem eles, a oferta não diria o que nem quanto.
 - Remoção de item do carrinho com "Desfazer".
+- O carrossel do hero troca de destaque pelos pontos ou arrastando a arte (toque, caneta ou mouse); o gesto não abre o NFT e o scroll vertical da página continua funcionando. Não há rotação automática.
 - Mudanças em tempo real piscam o valor alterado (sem animação com movimento reduzido) e são anunciadas.
 - Telas sem frame (confirmação mobile, perfil e carteiras no mobile, estados de erro, vazio e carregamento, revisão do pedido, estados de conexão da carteira) seguem os componentes e tokens do design.
 
