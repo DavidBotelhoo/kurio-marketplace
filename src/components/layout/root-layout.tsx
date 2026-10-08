@@ -10,6 +10,7 @@ import { SiteFooter } from '@/components/layout/site-footer'
 import { SiteHeader } from '@/components/layout/site-header'
 import { Toaster } from '@/components/ui/sonner'
 import { CartRealtimeSync } from '@/features/cart/components/cart-realtime-sync'
+import { OrderRealtimeSync } from '@/features/orders/components/order-realtime-sync'
 import { useFocusOnNavigate } from '@/hooks/use-focus-on-navigate'
 
 const MAIN_ID = 'conteudo'
@@ -70,6 +71,7 @@ export function RootLayout() {
       <Toaster />
       <RealtimeSync />
       <CartRealtimeSync />
+      <OrderRealtimeSync />
       <Suspense>
         <RouterDevtools position="top-right" />
         <QueryDevtools buttonPosition="bottom-right" />
