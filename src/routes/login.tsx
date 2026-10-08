@@ -2,11 +2,11 @@ import { createFileRoute, redirect } from '@tanstack/react-router'
 
 import { ScreenPlaceholder } from '@/components/layout/screen-placeholder'
 import { sessionQueryOptions } from '@/features/auth/queries'
-import { authSearchSchema } from '@/features/auth/redirect'
+import { validateAuthSearch } from '@/features/auth/redirect'
 import { sessionStore } from '@/features/auth/session-store'
 
 export const Route = createFileRoute('/login')({
-  validateSearch: authSearchSchema,
+  validateSearch: validateAuthSearch,
   beforeLoad: async ({ context, search }) => {
     const token = sessionStore.getToken()
     if (!token) return

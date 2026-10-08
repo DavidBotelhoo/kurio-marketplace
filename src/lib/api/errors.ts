@@ -1,6 +1,4 @@
-import { isAxiosError, isCancel } from 'axios'
-
-import { type ApiErrorCode, isApiErrorBody } from '@/contracts/errors'
+import type { ApiErrorCode } from '@/contracts/errors'
 
 /** Errors produced on the client side, without a server response. */
 export type TransportErrorCode = 'NETWORK_ERROR' | 'TIMEOUT' | 'CANCELED'
@@ -26,7 +24,7 @@ const DEFAULT_MESSAGES: Record<ClientErrorCode, string> = {
   UNKNOWN: 'Algo deu errado. Tente novamente.',
 }
 
-const CODE_BY_STATUS: Partial<Record<number, ApiErrorCode>> = {
+export const CODE_BY_STATUS: Partial<Record<number, ApiErrorCode>> = {
   400: 'VALIDATION_ERROR',
   401: 'UNAUTHENTICATED',
   403: 'FORBIDDEN',
@@ -89,30 +87,4 @@ export function isApiError(error: unknown): error is ApiError {
 
 export function hasErrorCode(error: unknown, code: ClientErrorCode): boolean {
   return isApiError(error) && error.code === code
-}
-
-export function toApiError(error: unknown): ApiError {
-  if (isApiError(error)) return error
-
-  if (isCancel(error)) return new ApiError({ code: 'CANCELED', cause: error })
-
-  if (!isAxiosError(error))
-    return new ApiError({ code: 'UNKNOWN', cause: error })
-
-  if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
-    return new ApiError({ code: 'TIMEOUT', cause: error })
-  }
-
-  const { response } = error
-  if (!response) return new ApiError({ code: 'NETWORK_ERROR', cause: error })
-
-  const { status } = response
-  const data: unknown = response.data
-  if (isApiErrorBody(data)) {
-    return new ApiError({ ...data.error, status, cause: error })
-  }
-
-  const code =
-    CODE_BY_STATUS[status] ?? (status >= 500 ? 'SERVER_ERROR' : 'UNKNOWN')
-  return new ApiError({ code, status, cause: error })
 }

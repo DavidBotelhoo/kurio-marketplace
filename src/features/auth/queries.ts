@@ -9,17 +9,28 @@ import { useRouter } from '@tanstack/react-router'
 import { useSyncExternalStore } from 'react'
 import { toast } from 'sonner'
 
-import type { AuthResponse } from '@/contracts/auth'
+import type {
+  AuthResponse,
+  LoginRequest,
+  RegisterRequest,
+} from '@/contracts/auth'
 
-import { fetchSession, login, logout, register } from './api'
 import { sessionKeys } from './query-keys'
 import { isProtectedLocation } from './route-guard'
 import { sessionStore } from './session-store'
 
+/*
+ * The API module (HTTP client + contract schemas) is loaded on demand: the
+ * header needs it only when a stored session must be validated, so visitors'
+ * first render does not wait for it.
+ */
+const loadApi = () => import('./api')
+
 export function sessionQueryOptions(token: string | null) {
   return queryOptions({
     queryKey: sessionKeys.current(token),
-    queryFn: ({ signal }) => fetchSession(token, signal),
+    queryFn: async ({ signal }) =>
+      token ? (await loadApi()).fetchSession(token, signal) : null,
     staleTime: 60_000,
   })
 }
@@ -50,7 +61,7 @@ export function startSession(queryClient: QueryClient, auth: AuthResponse) {
 export function useLoginMutation() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: login,
+    mutationFn: async (body: LoginRequest) => (await loadApi()).login(body),
     onSuccess: (auth) => {
       startSession(queryClient, auth)
     },
@@ -60,7 +71,8 @@ export function useLoginMutation() {
 export function useRegisterMutation() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: register,
+    mutationFn: async (body: RegisterRequest) =>
+      (await loadApi()).register(body),
     onSuccess: (auth) => {
       startSession(queryClient, auth)
     },
@@ -73,7 +85,7 @@ export function useLogoutMutation() {
     mutationFn: async () => {
       const token = sessionStore.getToken()
       // A failed request must not keep the user signed in locally.
-      if (token) await logout(token).catch(() => undefined)
+      if (token) await (await loadApi()).logout(token).catch(() => undefined)
     },
     onSettled: async () => {
       if (isProtectedLocation(router)) await router.navigate({ to: '/' })

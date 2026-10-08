@@ -1,26 +1,22 @@
 import { Link, useLocation } from '@tanstack/react-router'
+import { lazy, Suspense } from 'react'
 
-import {
-  HeartIcon,
-  LocationIcon,
-  LoginIcon,
-  UserFilledIcon,
-  UserIcon,
-} from '@/components/icons'
+import { LoginIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { Skeleton } from '@/components/ui/skeleton'
 
-import { useLogoutMutation, useSession, useSessionToken } from '../queries'
+import { useSession, useSessionToken } from '../queries'
+import { accountTriggerClass } from './account-trigger'
 
-const triggerClass = 'h-[2.1875rem] gap-1.5 px-2.5 text-16 font-medium'
+const AccountMenu = lazy(() => import('./account-menu'))
+
+function AccountSkeleton() {
+  return (
+    <Skeleton className="h-[2.1875rem] w-[6.25rem]">
+      <span className="sr-only">Carregando conta</span>
+    </Skeleton>
+  )
+}
 
 /** Header slot: "Entrar" for visitors, the account menu once signed in. */
 export function AccountActions() {
@@ -28,21 +24,14 @@ export function AccountActions() {
   const session = useSession()
   const location = useLocation()
   const onAuthScreen = /^\/(login|cadastro)(\/|$)/.test(location.pathname)
-  const logout = useLogoutMutation()
 
   // Validating a stored session after a refresh: keep the slot's size.
-  if (token && session.isPending) {
-    return (
-      <Skeleton className="h-[2.1875rem] w-[6.25rem]">
-        <span className="sr-only">Carregando conta</span>
-      </Skeleton>
-    )
-  }
+  if (token && session.isPending) return <AccountSkeleton />
 
   const user = session.data?.user
   if (!user) {
     return (
-      <Button asChild size="sm" className={triggerClass}>
+      <Button asChild size="sm" className={accountTriggerClass}>
         <Link
           to="/login"
           // On the auth screens keep the pending destination instead of
@@ -58,57 +47,9 @@ export function AccountActions() {
     )
   }
 
-  const firstName = user.displayName.split(' ')[0] ?? user.displayName
-
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          size="sm"
-          className={triggerClass}
-          aria-label={`Conta de ${user.displayName}`}
-        >
-          <UserFilledIcon className="size-4" />
-          <span className="max-w-[8ch] truncate">{firstName}</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuLabel>
-          <span className="block font-bold text-foreground">
-            {user.displayName}
-          </span>
-          {user.email}
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link to="/perfil">
-            <UserIcon />
-            Meu perfil
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link to="/perfil/carteiras">
-            <LocationIcon />
-            Carteiras
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link to="/perfil/favoritos">
-            <HeartIcon />
-            Lista de interesse
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          disabled={logout.isPending}
-          onSelect={() => {
-            logout.mutate()
-          }}
-        >
-          <LoginIcon />
-          Sair
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Suspense fallback={<AccountSkeleton />}>
+      <AccountMenu user={user} />
+    </Suspense>
   )
 }

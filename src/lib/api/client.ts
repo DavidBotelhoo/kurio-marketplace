@@ -3,7 +3,8 @@ import axios, { type InternalAxiosRequestConfig, isAxiosError } from 'axios'
 import { env } from '@/lib/env'
 
 import { getAuthToken, notifyUnauthorized } from './auth-token'
-import { ApiError, toApiError } from './errors'
+import { ApiError } from './errors'
+import { toApiError } from './to-api-error'
 import { waitForRequestGate } from './request-gate'
 
 export const REQUEST_TIMEOUT_MS = 10_000

@@ -1,5 +1,3 @@
-import * as z from 'zod/mini'
-
 /**
  * Only same-origin paths are accepted as post-login destinations, so a
  * crafted link cannot send users to another site (open redirect).
@@ -18,17 +16,25 @@ export function safeRedirect(value: unknown): string | undefined {
   return value
 }
 
-/** Search params of /login and /cadastro. */
-export const authSearchSchema = z.object({
-  redirect: z.optional(z.pipe(z.unknown(), z.transform(safeRedirect))),
-  reason: z.optional(
-    z.pipe(
-      z.unknown(),
-      z.transform((value) =>
-        value === 'expired' || value === 'required' ? value : undefined,
-      ),
-    ),
-  ),
-})
+export interface AuthSearch {
+  redirect?: string
+  reason?: 'expired' | 'required'
+}
 
-export type AuthSearch = z.output<typeof authSearchSchema>
+/**
+ * validateSearch of /login and /cadastro. A plain function (no schema
+ * library) because route options are part of the entry chunk.
+ */
+export function validateAuthSearch(
+  search: Record<string, unknown>,
+): AuthSearch {
+  const redirect = safeRedirect(search.redirect)
+  const reason =
+    search.reason === 'expired' || search.reason === 'required'
+      ? search.reason
+      : undefined
+  return {
+    ...(redirect ? { redirect } : {}),
+    ...(reason ? { reason } : {}),
+  }
+}
