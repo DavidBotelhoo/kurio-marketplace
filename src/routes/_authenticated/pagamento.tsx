@@ -1,8 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { ScreenPlaceholder } from '@/components/layout/screen-placeholder'
+import { PaymentPage } from '@/features/checkout/payment-page'
 
 export const Route = createFileRoute('/_authenticated/pagamento')({
   head: () => ({ meta: [{ title: 'Pagamento | Kurio' }] }),
-  component: () => <ScreenPlaceholder title="Pagamento" />,
+  // The mobile frame ends with the "Confirmar compra" button.
+  staticData: { mobileFooter: false },
+  component: PaymentPage,
 })
