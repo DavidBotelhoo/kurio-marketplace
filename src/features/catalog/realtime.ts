@@ -7,13 +7,15 @@ import type {
   NftSummary,
   RelatedResponse,
 } from '@/contracts/catalog'
+import type { FavoritesResponse } from '@/contracts/favorites'
 import type { NftUpdatedEvent } from '@/contracts/realtime'
+import { favoritesKeys } from '@/features/favorites/query-keys'
 
 import { catalogKeys } from './query-keys'
 
 /**
  * Applies an `nft.updated` event to every cached view of the NFT (lists,
- * highlights, related, detail). Each entry only accepts a newer version, so
+ * highlights, related, detail, favorites). Each entry only accepts a newer version, so
  * duplicated or late events never regress the state.
  */
 export function applyNftUpdated(
@@ -49,6 +51,15 @@ export function applyNftUpdated(
   queryClient.setQueriesData<RelatedResponse>(
     { queryKey: catalogKeys.relatedAll() },
     (data) => data && { items: data.items.map(patch) },
+  )
+  queryClient.setQueriesData<FavoritesResponse>(
+    { predicate: (query) => favoritesKeys.isList(query.queryKey) },
+    (data) =>
+      data && {
+        items: data.items.map((item) =>
+          item.nftId === id ? { ...item, nft: patch(item.nft) } : item,
+        ),
+      },
   )
   queryClient.setQueryData<NftDetail>(catalogKeys.detail(id), (data) =>
     !data || data.version >= event.version

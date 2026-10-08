@@ -39,6 +39,16 @@ export function useSessionToken() {
   return useSyncExternalStore(sessionStore.subscribe, sessionStore.getToken)
 }
 
+const getStoredUserId = () => sessionStore.get()?.userId ?? null
+
+/**
+ * Id of the stored session's user, available before the session is
+ * revalidated. Private queries key on it; a rejected token clears it (401).
+ */
+export function useSessionUserId() {
+  return useSyncExternalStore(sessionStore.subscribe, getStoredUserId)
+}
+
 /** Current session; `data` is null for visitors. */
 export function useSession() {
   return useQuery(sessionQueryOptions(useSessionToken()))
