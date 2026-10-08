@@ -169,7 +169,9 @@ export function OrderPage() {
             accent
             aria-describedby={undefined}
             closeLabel="Fechar e voltar ao início"
-            className="max-w-[36.125rem] pb-10 [&_[data-slot=dialog-close]]:top-5"
+            // Below the header (Figma: the card never covers it); the window
+            // height limits it, and the NFT list gives up height first.
+            className="top-[5.5rem] max-h-[calc(100dvh-6.5rem)] max-w-[36.125rem] translate-y-0 pb-12 tall:flex tall:flex-col [&_[data-slot=dialog-close]]:top-5"
           >
             {body(DialogHeading)}
             {announcement}

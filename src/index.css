@@ -95,6 +95,32 @@
 }
 
 /*
+ * Dialog screens tall enough for a card to fit with a shortened inner list
+ * (see the order receipt); shorter windows scroll the whole card instead.
+ */
+@custom-variant tall (@media (width >= 48rem) and (height >= 54rem));
+
+/* Thin scrollbar in the brand colors, for lists that scroll inside a card. */
+@utility scrollbar-brand {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary) var(--color-border);
+
+  &::-webkit-scrollbar {
+    width: 0.375rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    border-radius: 9999px;
+    background: var(--color-border);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background: var(--color-primary);
+  }
+}
+
+/*
  * iOS zooms into a focused field whose text is under 16px and leaves the page
  * zoomed afterwards, so the layout no longer fits the screen. On iOS only,
  * fields use 16px; elsewhere they keep the Figma sizes. Unlayered on purpose:

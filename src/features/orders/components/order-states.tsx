@@ -20,77 +20,102 @@ interface StateProps {
   Title: React.ComponentType<{ className?: string; children: React.ReactNode }>
 }
 
+/** More kinds of NFT than this: the list scrolls, showing 3½ lines. */
+const VISIBLE_LINES = 3
+
+const headClass =
+  'sticky top-0 z-[1] border-b border-primary/30 bg-card pb-3 md:pb-[0.4375rem]'
+
 /** Items and values of the order snapshot (never re-read from the catalog). */
 function OrderLines({ order }: { order: Order }) {
   const discounted = compareEth(order.discountEth, '0') > 0
+  const scrolls = order.items.length > VISIBLE_LINES
   return (
-    <section aria-labelledby={`details-${order.id}`} className="mt-8">
+    <section
+      aria-labelledby={`details-${order.id}`}
+      className="mt-8 md:mt-[1.125rem] tall:flex tall:min-h-0 tall:flex-col"
+    >
       <h2 id={`details-${order.id}`} className="text-15 font-bold">
         Detalhes da transação
       </h2>
-      <table className="mt-3 w-full border-separate border-spacing-y-3 text-left">
-        <thead>
-          <tr className="text-16">
-            <th
-              scope="col"
-              className="border-b border-primary/30 pb-3 font-bold"
-            >
-              NFTs
-            </th>
-            <th
-              scope="col"
-              className="hidden border-b border-primary/30 pb-3 text-center font-bold sm:table-cell"
-            >
-              Edições
-            </th>
-            <th
-              scope="col"
-              className="border-b border-primary/30 pb-3 text-right font-medium"
-            >
-              Subtotal
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {order.items.map((item) => (
-            <tr key={item.itemId}>
-              <td className="py-0">
-                <div className="flex items-center gap-3">
-                  <NftImage
-                    image={item.image}
-                    alt=""
-                    sizes="70px"
-                    className="size-14 shrink-0 rounded-[0.5rem] object-cover sm:size-[4.375rem]"
-                  />
-                  <div className="min-w-0">
-                    <p className="text-15 font-bold sm:text-16">{item.name}</p>
-                    <p className="text-14 text-subtle-foreground">
-                      ID do token: {item.tokenId}
-                      <span className="sr-only">
-                        , edição {item.editionLabel}
-                      </span>
-                    </p>
-                    <p className="text-14 text-muted-foreground sm:hidden">
-                      <span aria-hidden="true">(x {item.quantity})</span>
-                      <span className="sr-only">
-                        Quantidade: {item.quantity}
-                      </span>
-                    </p>
-                  </div>
-                </div>
-              </td>
-              <td className="hidden text-center text-14 whitespace-nowrap text-muted-foreground sm:table-cell">
-                <span aria-hidden="true">(x {item.quantity})</span>
-                <span className="sr-only">{item.quantity}</span>
-              </td>
-              <td className="pl-2 text-right text-16 font-bold whitespace-nowrap text-highlight sm:text-18">
-                {formatEth(item.lineTotalEth)}
-              </td>
+      {/* Only this list scrolls (header row kept in view); in the dialog it
+          also gives up height first when the window is short (tall). */}
+      <div
+        role={scrolls ? 'region' : undefined}
+        aria-label={scrolls ? 'NFTs comprados' : undefined}
+        tabIndex={scrolls ? 0 : undefined}
+        className={cn(
+          'mt-3 md:mt-[0.3125rem]',
+          scrolls &&
+            '-mr-4 max-h-[19.75rem] scrollbar-brand overflow-y-auto pr-4 focus-visible:outline-offset-4 md:max-h-[20.375rem] tall:min-h-[9rem]',
+        )}
+      >
+        <table className="w-full border-separate border-spacing-0 text-left">
+          <thead>
+            <tr className="text-16">
+              <th scope="col" className={cn(headClass, 'font-bold')}>
+                NFTs
+              </th>
+              <th
+                scope="col"
+                className={cn(
+                  headClass,
+                  'hidden text-center font-bold sm:table-cell',
+                )}
+              >
+                Edições
+              </th>
+              <th
+                scope="col"
+                className={cn(headClass, 'text-right font-medium')}
+              >
+                Subtotal
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-      <dl className="mt-1 ml-auto grid max-w-[20rem] gap-2">
+          </thead>
+          <tbody>
+            {order.items.map((item) => (
+              <tr key={item.itemId} className="[&>td]:pt-3">
+                <td>
+                  <div className="flex items-center gap-3">
+                    <NftImage
+                      image={item.image}
+                      alt=""
+                      sizes="70px"
+                      className="size-14 shrink-0 rounded-[0.5rem] object-cover sm:size-[4.375rem]"
+                    />
+                    <div className="min-w-0">
+                      <p className="text-15 font-bold sm:text-16">
+                        {item.name}
+                      </p>
+                      <p className="text-14 text-subtle-foreground">
+                        ID do token: {item.tokenId}
+                        <span className="sr-only">
+                          , edição {item.editionLabel}
+                        </span>
+                      </p>
+                      <p className="text-14 text-muted-foreground sm:hidden">
+                        <span aria-hidden="true">(x {item.quantity})</span>
+                        <span className="sr-only">
+                          Quantidade: {item.quantity}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                </td>
+                <td className="hidden text-center text-14 whitespace-nowrap text-muted-foreground sm:table-cell">
+                  <span aria-hidden="true">(x {item.quantity})</span>
+                  <span className="sr-only">{item.quantity}</span>
+                </td>
+                <td className="pl-2 text-right text-16 font-bold whitespace-nowrap text-highlight sm:text-18">
+                  {formatEth(item.lineTotalEth)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <dl className="mt-3 ml-auto grid max-w-[20rem] gap-2 md:mt-1 md:gap-1">
         {discounted ? (
           <>
             <div className="flex items-baseline justify-between gap-4">
@@ -120,11 +145,15 @@ function OrderLines({ order }: { order: Order }) {
 
 function InfoRow({ items }: { items: { label: string; value: string }[] }) {
   return (
-    <dl className="grid grid-cols-2 gap-y-4 border-y border-primary px-4 py-4 text-muted-foreground sm:flex sm:justify-center sm:divide-x sm:divide-primary sm:px-0">
+    <dl className="grid grid-cols-2 gap-y-4 border-y border-primary px-4 py-4 text-muted-foreground sm:flex sm:justify-center sm:divide-x sm:divide-primary sm:px-0 md:pt-3.5 md:pb-3.5">
       {items.map((item) => (
         <div key={item.label} className="min-w-0 px-4 sm:px-[1.0625rem]">
-          <dt className="text-14 font-bold">{item.label}</dt>
-          <dd className="text-15 break-words">{item.value}</dd>
+          <dt className="text-14 font-bold md:leading-[1.125rem]">
+            {item.label}
+          </dt>
+          <dd className="text-15 break-words md:leading-[1.125rem]">
+            {item.value}
+          </dd>
         </div>
       ))}
     </dl>
@@ -136,7 +165,7 @@ export function OrderReceipt({ order, Title }: StateProps) {
   const { transaction } = order
   return (
     <>
-      <div className="grid justify-items-center gap-5 pt-7 pb-6 text-center">
+      <div className="grid shrink-0 justify-items-center gap-5 pt-7 pb-6 text-center md:pt-6 md:pb-[1.125rem]">
         <ThankYouIllustration
           aria-hidden="true"
           className="size-20 text-primary"
@@ -159,15 +188,15 @@ export function OrderReceipt({ order, Title }: StateProps) {
           { label: 'Carteira', value: providerLabel(order.wallet.provider) },
         ]}
       />
-      <div className="px-6 sm:px-11">
+      <div className="px-6 sm:px-11 tall:flex tall:min-h-0 tall:flex-col">
         <OrderLines order={order} />
-        <p className="mt-5 border-t border-primary/30 pt-4 text-center text-14 leading-[1.7] text-muted-foreground">
+        <p className="mt-5 border-t border-primary/30 pt-4 text-center text-14 leading-[1.7] text-muted-foreground md:mt-2 md:pt-3 md:leading-[1.375rem]">
           Transação confirmada na {networkLabel(order.wallet.network)}. A
           propriedade foi transferida para sua carteira conectada e registrada
           na rede.
         </p>
         {transaction ? (
-          <div className="mt-6 flex justify-center">
+          <div className="mt-6 flex justify-center md:mt-5">
             <Button asChild size="lg" className="h-12 rounded-[0.3125rem] px-5">
               <a
                 href={transaction.explorerUrl}
