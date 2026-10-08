@@ -13,9 +13,17 @@ import {
   updateMockConfig,
 } from './config'
 import { db } from './db/database'
+import { changeNftPrice, setEditionAvailability } from './domain/catalog'
 import type { MockDatabase } from './db/schema'
 import { handlers } from './handlers'
 import { resetRequestCounters } from './network'
+import {
+  clearEventLog,
+  connectionCount,
+  disconnectAll,
+  resendLastEvent,
+  sendStaleEvent,
+} from './realtime/server'
 import { listOperations, type OperationInfo } from './operations'
 import { clearPrefixedStorage, MOCK_CONFIG_KEY } from './storage'
 import type { MockUrlOverrides } from './url-overrides'
@@ -42,6 +50,7 @@ export function resetMockData() {
   db.configure(config.dataset)
   db.reset()
   resetRequestCounters()
+  clearEventLog()
 }
 
 /** Restores data and scenario to the defaults. */
@@ -51,6 +60,7 @@ export function resetMockEnvironment() {
   db.configure(DEFAULT_CONFIG.dataset)
   db.reset()
   resetRequestCounters()
+  clearEventLog()
 }
 
 /** Programmatic control used by Playwright tests and the browser console. */
@@ -62,6 +72,15 @@ export interface KurioMocksApi {
   resetAll: () => void
   snapshot: () => MockDatabase
   operations: () => OperationInfo[]
+  /** Server-side realtime controls; events reach the app via socket.io-client. */
+  realtime: {
+    changePrice: typeof changeNftPrice
+    setAvailability: typeof setEditionAvailability
+    resendLast: typeof resendLastEvent
+    sendStale: typeof sendStaleEvent
+    disconnectAll: () => void
+    connections: () => number
+  }
 }
 
 declare global {
@@ -97,6 +116,16 @@ export async function startMocks(overrides: MockUrlOverrides) {
     resetAll: resetMockEnvironment,
     snapshot: () => structuredClone(db.read()),
     operations: listOperations,
+    realtime: {
+      changePrice: changeNftPrice,
+      setAvailability: setEditionAvailability,
+      resendLast: resendLastEvent,
+      sendStale: sendStaleEvent,
+      disconnectAll: () => {
+        disconnectAll()
+      },
+      connections: connectionCount,
+    },
   }
 
   void import('./panel/mount').then(({ mountMockPanel }) => {

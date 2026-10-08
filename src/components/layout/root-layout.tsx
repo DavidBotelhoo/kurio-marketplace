@@ -5,6 +5,7 @@ import {
   MOBILE_TAB_BAR_HEIGHT,
   MobileTabBar,
 } from '@/components/layout/mobile-tab-bar'
+import { RealtimeSync } from '@/components/layout/realtime-sync'
 import { SiteFooter } from '@/components/layout/site-footer'
 import { SiteHeader } from '@/components/layout/site-header'
 import { Toaster } from '@/components/ui/sonner'
@@ -60,6 +61,7 @@ export function RootLayout() {
       </div>
       {showTabBar ? <MobileTabBar /> : null}
       <Toaster />
+      <RealtimeSync />
       <Suspense>
         <RouterDevtools position="top-right" />
         <QueryDevtools buttonPosition="bottom-right" />

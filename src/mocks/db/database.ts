@@ -5,6 +5,8 @@ import { createSeed } from './seed'
 type Listener = () => void
 
 let state: MockDatabase | null = null
+/** Bumped on every change; snapshot key for useSyncExternalStore. */
+let revision = 0
 let dataset: DatasetId = 'default'
 const listeners = new Set<Listener>()
 
@@ -32,6 +34,7 @@ function load(): MockDatabase {
 }
 
 function notify() {
+  revision += 1
   for (const listener of listeners) listener()
 }
 
@@ -67,6 +70,8 @@ export const db = {
     persist(state)
     notify()
   },
+
+  revision: () => revision,
 
   subscribe(listener: Listener) {
     listeners.add(listener)

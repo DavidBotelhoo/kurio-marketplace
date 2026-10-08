@@ -26,6 +26,8 @@ export default defineConfig({
       'msw',
       'msw/browser',
       'zod/mini',
+      'socket.io-client',
+      '@mswjs/socket.io-binding',
       '@tanstack/react-router-devtools',
       '@tanstack/react-query-devtools',
     ],
