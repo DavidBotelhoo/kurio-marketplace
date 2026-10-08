@@ -29,7 +29,8 @@ export interface UserRecord {
   updatedAt: string
 }
 
-export type ArtworkId = 'emerald' | 'nomad' | 'ivory' | 'golden'
+export type { ArtworkId } from '@/lib/artwork-image'
+import type { ArtworkId } from '@/lib/artwork-image'
 
 export interface EditionRecord {
   id: string

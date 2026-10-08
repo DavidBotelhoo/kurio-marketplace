@@ -5,34 +5,18 @@ import {
   type NftSummary,
 } from '@/contracts/catalog'
 import type { Image } from '@/contracts/common'
+import { artworkImage as createArtworkImage } from '@/lib/artwork-image'
 
 import type { ArtworkId, EditionRecord, NftRecord } from '../db/schema'
 import { ARTWORKS, COLLECTIONS } from '../fixtures/catalog'
 
-const IMAGE_WIDTHS = [128, 256, 384, 512, 768, 1024] as const
 const ROYALTY_PERCENT = 5
-
-function srcSet(artwork: ArtworkId, format: 'avif' | 'webp') {
-  return IMAGE_WIDTHS.map(
-    (width) =>
-      `/images/nfts/${artwork}-${String(width)}.${format} ${String(width)}w`,
-  ).join(', ')
-}
 
 export function artworkImage(
   artwork: ArtworkId,
   alt = ARTWORKS[artwork].alt,
 ): Image {
-  return {
-    url: `/images/nfts/${artwork}-512.webp`,
-    width: 1024,
-    height: 1024,
-    alt,
-    sources: [
-      { type: 'image/avif', srcSet: srcSet(artwork, 'avif') },
-      { type: 'image/webp', srcSet: srcSet(artwork, 'webp') },
-    ],
-  }
+  return createArtworkImage(artwork, alt)
 }
 
 export function isAvailable(edition: EditionRecord) {
