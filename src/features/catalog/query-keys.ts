@@ -1,10 +1,11 @@
-import type { NftListParams } from '@/contracts/catalog'
+import type { CatalogListParams } from './search'
 
 /** Query key factory for catalog data (shared by queries and realtime). */
 export const catalogKeys = {
   all: ['nfts'] as const,
   lists: () => [...catalogKeys.all, 'list'] as const,
-  list: (params: NftListParams) => [...catalogKeys.lists(), params] as const,
+  list: (params: CatalogListParams) =>
+    [...catalogKeys.lists(), params] as const,
   highlights: () => [...catalogKeys.all, 'highlights'] as const,
   details: () => [...catalogKeys.all, 'detail'] as const,
   detail: (nftId: string) => [...catalogKeys.details(), nftId] as const,

@@ -1,6 +1,13 @@
 import * as z from 'zod/mini'
 
 import {
+  CATEGORIES,
+  NETWORKS,
+  NFT_PAGE_SIZE,
+  NFT_SORTS,
+  NFT_TABS,
+} from './catalog-taxonomy'
+import {
   ethAmountSchema,
   imageSchema,
   isoDateTimeSchema,
@@ -8,29 +15,20 @@ import {
 } from './common'
 
 /* ---------------------------------------------------------------------------
- * Taxonomy
+ * Taxonomy (constants live in ./catalog-taxonomy, free of schema code)
  * ------------------------------------------------------------------------- */
 
-export const CATEGORIES = [
-  { id: 'arte-digital', label: 'Arte digital' },
-  { id: 'fotografia', label: 'Fotografia' },
-  { id: 'musica', label: 'Música' },
-  { id: 'arte-3d', label: 'Arte 3D' },
-  { id: 'colecionaveis', label: 'Colecionáveis' },
-  { id: 'generativa', label: 'Generativa' },
-  { id: 'jogos', label: 'Jogos' },
-  { id: 'assinaturas', label: 'Assinaturas' },
-  { id: 'utilidade', label: 'Utilidade' },
-] as const
-
-export const NETWORKS = [
-  { id: 'ethereum', label: 'Ethereum' },
-  { id: 'polygon', label: 'Polygon' },
-  { id: 'solana', label: 'Solana' },
-] as const
-
-export type CategoryId = (typeof CATEGORIES)[number]['id']
-export type NetworkId = (typeof NETWORKS)[number]['id']
+export {
+  CATEGORIES,
+  type CategoryId,
+  NETWORKS,
+  type NetworkId,
+  NFT_PAGE_SIZE,
+  NFT_SORTS,
+  NFT_TABS,
+  type NftSort,
+  type NftTab,
+} from './catalog-taxonomy'
 
 const ids = <T extends readonly { id: string }[]>(items: T) =>
   items.map((item) => item.id) as [T[number]['id'], ...T[number]['id'][]]
@@ -39,18 +37,9 @@ export const categoryIdSchema = z.enum(ids(CATEGORIES))
 export const networkIdSchema = z.enum(ids(NETWORKS))
 
 /** Catalog tabs: "Todos os NFTs", "Novos lançamentos", "Em alta". */
-export const NFT_TABS = ['all', 'new', 'trending'] as const
 export const nftTabSchema = z.enum(NFT_TABS)
-export type NftTab = z.infer<typeof nftTabSchema>
 
-export const NFT_SORTS = [
-  'recent',
-  'price-asc',
-  'price-desc',
-  'popular',
-] as const
 export const nftSortSchema = z.enum(NFT_SORTS)
-export type NftSort = z.infer<typeof nftSortSchema>
 
 /* ---------------------------------------------------------------------------
  * NFTs
@@ -125,8 +114,6 @@ export type NftDetail = z.infer<typeof nftDetailSchema>
 
 const positiveInt = (min: number, max: number) =>
   z.coerce.number().check(z.multipleOf(1), z.gte(min), z.lte(max))
-
-export const NFT_PAGE_SIZE = 9
 
 /** Query parameters (arrays as repeated keys: ?categories=a&categories=b). */
 export const nftListQuerySchema = z.object({

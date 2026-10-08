@@ -3,6 +3,7 @@ import { createRouter } from '@tanstack/react-router'
 
 import { NotFound } from '@/components/layout/not-found'
 import { RouteError } from '@/components/layout/route-error'
+import { parseSearchParams, stringifySearchParams } from '@/lib/search-params'
 
 import { routeTree } from './routeTree.gen'
 
@@ -20,6 +21,8 @@ export function createAppRouter(context: RouterContext) {
     defaultPreloadStaleTime: 0,
     defaultNotFoundComponent: () => <NotFound />,
     defaultErrorComponent: RouteError,
+    parseSearch: parseSearchParams,
+    stringifySearch: stringifySearchParams,
   })
 }
 
