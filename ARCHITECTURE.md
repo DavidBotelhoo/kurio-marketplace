@@ -209,6 +209,7 @@ Ajustes em relação ao layout:
 - Filtros ativos aparecem como chips removíveis acima dos resultados (não estão no Figma), com "Limpar filtros".
 - O "NFT em destaque" exibe nome e preço sobre a arte (não estão no Figma): sem eles, a oferta não diria o que nem quanto.
 - Remoção de item do carrinho com "Desfazer".
+- Confirmação no desktop: o cartão abre abaixo do header (como no Figma) e nunca passa da altura da janela. Com mais de 3 tipos de NFT, a lista mostra 3 itens e meio e rola sozinha, com cabeçalho fixo e barra de rolagem nas cores do projeto; em janelas mais baixas, a lista encolhe antes de o cartão precisar rolar. No mobile, a lista segue a mesma regra.
 - O carrossel do hero troca de destaque pelos pontos ou arrastando a arte (toque, caneta ou mouse); o gesto não abre o NFT e o scroll vertical da página continua funcionando. Não há rotação automática.
 - Os carrosséis com rolagem (relacionados, recomendações do carrinho, galeria mobile) rolam nativamente com toque, trackpad e teclado, e também podem ser arrastados com o mouse: ao soltar, assentam no item mais próximo, e um arraste nunca abre o card.
 - Mudanças em tempo real piscam o valor alterado (sem animação com movimento reduzido) e são anunciadas.
