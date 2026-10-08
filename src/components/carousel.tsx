@@ -1,5 +1,6 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react'
 
+import { useDragScroll } from '@/hooks/use-drag-scroll'
 import { cn } from '@/lib/utils'
 
 interface CarouselProps {
@@ -14,7 +15,8 @@ interface CarouselProps {
 
 /**
  * Horizontal list with scroll snapping and the Figma page dots. Native
- * scrolling (touch, trackpad, keyboard) works; the dots jump between pages.
+ * scrolling (touch, trackpad, keyboard) works, the mouse can drag it, and the
+ * dots jump between pages.
  */
 export function Carousel({
   label,
@@ -26,6 +28,7 @@ export function Carousel({
   const listRef = useRef<HTMLUListElement>(null)
   const [pages, setPages] = useState(1)
   const [page, setPage] = useState(0)
+  const drag = useDragScroll(listRef)
 
   useEffect(() => {
     const list = listRef.current
@@ -66,8 +69,10 @@ export function Carousel({
       <ul
         ref={listRef}
         aria-label={label}
+        {...drag.handlers}
+        data-dragging={drag.dragging}
         className={cn(
-          'flex snap-x snap-mandatory [scrollbar-width:none] overflow-x-auto [&::-webkit-scrollbar]:hidden',
+          'flex snap-x snap-mandatory [scrollbar-width:none] overflow-x-auto data-[dragging=true]:cursor-grabbing data-[dragging=true]:select-none [&::-webkit-scrollbar]:hidden',
           gapClassName,
         )}
       >

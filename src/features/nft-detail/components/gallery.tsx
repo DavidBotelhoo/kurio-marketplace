@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dialog'
 import type { NftDetail } from '@/contracts/catalog'
 import { NftImage } from '@/features/catalog/components/nft-image'
+import { useDragScroll } from '@/hooks/use-drag-scroll'
 import { cn } from '@/lib/utils'
 
 /**
@@ -90,6 +91,7 @@ export function MobileGallery({ nft }: { nft: NftDetail }) {
   const views = nft.gallery.length ? nft.gallery : [nft.image]
   const listRef = useRef<HTMLDivElement>(null)
   const [index, setIndex] = useState(0)
+  const drag = useDragScroll(listRef)
 
   useEffect(() => {
     const list = listRef.current
@@ -111,7 +113,9 @@ export function MobileGallery({ nft }: { nft: NftDetail }) {
         role="region"
         aria-label="Vistas do NFT"
         tabIndex={0}
-        className="flex snap-x snap-mandatory [scrollbar-width:none] overflow-x-auto rounded-[1.5rem] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring [&::-webkit-scrollbar]:hidden"
+        {...drag.handlers}
+        data-dragging={drag.dragging}
+        className="flex snap-x snap-mandatory [scrollbar-width:none] overflow-x-auto rounded-[1.5rem] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring data-[dragging=true]:cursor-grabbing data-[dragging=true]:select-none [&::-webkit-scrollbar]:hidden"
       >
         {/* Full width up front: the views must not wait for the images to
             get their size (layout shift). */}
