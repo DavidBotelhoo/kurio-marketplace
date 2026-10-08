@@ -1,4 +1,5 @@
 import { authHandlers } from './auth'
+import { cartHandlers } from './cart'
 import { catalogHandlers } from './catalog'
 import { favoritesHandlers } from './favorites'
 import { realtimeHandlers } from '../realtime/handler'
@@ -9,5 +10,6 @@ export const handlers = [
   ...authHandlers,
   ...catalogHandlers,
   ...favoritesHandlers,
+  ...cartHandlers,
   ...realtimeHandlers,
 ]

@@ -12,17 +12,9 @@ import {
 import { hashPassword, verifyPassword } from '../crypto'
 import { db } from '../db/database'
 import type { UserRecord } from '../db/schema'
-import { route } from '../http'
+import { readJsonBody, route } from '../http'
 import { apiError } from '../responses'
 import { validationError } from '../validation'
-
-async function readJsonBody(request: Request): Promise<unknown> {
-  try {
-    return await request.json()
-  } catch {
-    return null
-  }
-}
 
 export const authHandlers = [
   route(

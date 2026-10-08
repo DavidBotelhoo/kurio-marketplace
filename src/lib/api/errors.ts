@@ -14,6 +14,7 @@ const DEFAULT_MESSAGES: Record<ClientErrorCode, string> = {
   FORBIDDEN: 'Você não tem permissão para acessar este recurso.',
   NOT_FOUND: 'Não encontramos o que você procurava.',
   CONFLICT: 'Os dados mudaram desde a última consulta.',
+  AVAILABILITY_CONFLICT: 'Quantidade indisponível para esta edição.',
   RATE_LIMITED: 'Muitas tentativas. Aguarde um instante e tente novamente.',
   SERVER_ERROR: 'Tivemos um problema no servidor. Tente novamente.',
   SERVICE_UNAVAILABLE: 'Serviço temporariamente indisponível. Tente novamente.',

@@ -6,7 +6,7 @@ import type { CategoryId, NetworkId } from '@/contracts/catalog'
  */
 
 /** Bump whenever record shapes change; stale snapshots are reseeded. */
-export const DB_VERSION = 5
+export const DB_VERSION = 6
 
 /**
  * Seed variants: "default" is the full catalog; "empty-catalog" keeps users
@@ -83,6 +83,27 @@ export interface FavoriteRecord {
   createdAt: string
 }
 
+export interface CartLineRecord {
+  /** Stable per cart: one line per NFT edition. */
+  id: string
+  nftId: string
+  editionId: string
+  quantity: number
+  /** Edition price when the shopper last changed the line. */
+  unitPriceEth: string
+  addedAt: string
+  updatedAt: string
+}
+
+/** "user:<userId>" for collectors, "guest:<id>" for visitors. */
+export type CartOwner = `user:${string}` | `guest:${string}`
+
+export interface CartRecord {
+  owner: CartOwner
+  lines: CartLineRecord[]
+  updatedAt: string
+}
+
 export interface MockDatabase {
   /** Bumped whenever the record shapes change; older snapshots are reseeded. */
   version: number
@@ -92,4 +113,5 @@ export interface MockDatabase {
   sessions: SessionRecord[]
   nfts: NftRecord[]
   favorites: FavoriteRecord[]
+  carts: CartRecord[]
 }

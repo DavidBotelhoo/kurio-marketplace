@@ -19,6 +19,15 @@ interface RouteOptions {
   label: string
 }
 
+/** Parsed JSON body, or null when it is missing or malformed. */
+export async function readJsonBody(request: Request): Promise<unknown> {
+  try {
+    return await request.json()
+  } catch {
+    return null
+  }
+}
+
 /**
  * Declares a mocked REST endpoint. Every route goes through the same network
  * conditions (offline, latency, injected failures) before and after the
