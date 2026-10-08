@@ -220,8 +220,13 @@ Ajustes em relação ao layout:
 - Carrinho: chip da edição em cada linha; desconto sempre exibido no resumo (`(-) 0.00 ETH` sem cupom); posição do ícone de lixeira ajustada no mobile; recomendações só a partir de 768 px.
 - Pagamento: seleção de rede também no mobile; indicação e ENS obrigatórios conforme o layout; diálogo de revisão e estados de conexão da carteira, que não existem no Figma.
 - Perfil no mobile: navegação entre seções em pílulas.
+- iOS: campos de formulário usam 16 px (Figma: 13–15 px). Abaixo disso, o iOS amplia a página ao focar o campo e a mantém ampliada, e o layout deixa de caber na tela.
 - Ícones de senha visível e de filtro selecionado desenhados no estilo do conjunto, pois não existem no arquivo.
 - Ajustes de acessibilidade listados na seção acima.
+
+## Telas de celular e área segura
+
+A página ocupa a tela inteira (`viewport-fit=cover`), e as alturas usam `dvh`, que acompanha as barras do navegador. A tab bar e as barras fixas (compra no detalhe, resumo do carrinho, pagamento, filtros) somam `env(safe-area-inset-bottom)` ao seu espaço, ficando acima da barra de gestos e da barra de ferramentas do navegador; o container lateral respeita o notch em paisagem.
 
 ## Limitações
 
