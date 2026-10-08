@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { notifyUnavailable } from '@/lib/unavailable'
 import { cn } from '@/lib/utils'
 
-import type { AuthLayout } from './auth-shell'
+import type { AuthLayout } from './auth-layout-context'
 
 const PROVIDERS = [
   { name: 'Google', Icon: GoogleIcon, iconClass: 'size-5' },

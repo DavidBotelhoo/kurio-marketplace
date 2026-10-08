@@ -11,6 +11,8 @@ interface FieldProps extends InputProps {
   hideLabel?: boolean
   error?: string | undefined
   description?: string
+  /** Description announced by assistive technology but not shown. */
+  hideDescription?: boolean
   required?: boolean
 }
 
@@ -64,6 +66,7 @@ export function TextField({
   hideLabel,
   error,
   description,
+  hideDescription,
   required,
   className,
   ...props
@@ -92,7 +95,13 @@ export function TextField({
         {...props}
       />
       {description ? (
-        <p id={descriptionId} className="text-12 text-muted-foreground">
+        <p
+          id={descriptionId}
+          className={cn(
+            'text-12 text-muted-foreground',
+            hideDescription && 'sr-only',
+          )}
+        >
           {description}
         </p>
       ) : null}
@@ -108,6 +117,7 @@ export function PasswordField({
   hideLabel,
   error,
   description,
+  hideDescription,
   required,
   className,
   size,
@@ -162,7 +172,13 @@ export function PasswordField({
         </button>
       </div>
       {description ? (
-        <p id={descriptionId} className="text-12 text-muted-foreground">
+        <p
+          id={descriptionId}
+          className={cn(
+            'text-12 text-muted-foreground',
+            hideDescription && 'sr-only',
+          )}
+        >
           {description}
         </p>
       ) : null}

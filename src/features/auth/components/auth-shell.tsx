@@ -1,5 +1,11 @@
-import { Link, useNavigate, useSearch } from '@tanstack/react-router'
-import { type ReactNode, useRef } from 'react'
+import {
+  Link,
+  Outlet,
+  useMatchRoute,
+  useNavigate,
+  useSearch,
+} from '@tanstack/react-router'
+import { useRef } from 'react'
 
 import {
   Dialog,
@@ -12,19 +18,22 @@ import { DESKTOP_QUERY, useMediaQuery } from '@/hooks/use-media-query'
 import { cn } from '@/lib/utils'
 
 import { type AuthSearch, isPrivatePath, validateAuthSearch } from '../redirect'
+import { AuthLayoutContext } from './auth-layout-context'
 import { SocialSignIn } from './social-sign-in'
 
-export type AuthLayout = 'dialog' | 'page'
+type AuthMode = 'login' | 'register'
 
-interface AuthShellProps {
-  mode: 'login' | 'register'
-  /** Mobile page heading and dialog title. */
-  title: string
-  /** Dialog subtitle (desktop). */
-  description: string
-  children: (layout: AuthLayout) => ReactNode
-  /** Link shown under the page on mobile (switch between sign in/up). */
-  switchLink: ReactNode
+const COPY: Record<AuthMode, { title: string; description: string }> = {
+  login: {
+    title: 'Entrar',
+    description:
+      'Entre para gerenciar sua carteira, coleção e perfil de criador.',
+  },
+  register: {
+    title: 'Criar perfil de colecionador',
+    description:
+      'Crie seu perfil de colecionador e conecte uma carteira quando quiser.',
+  },
 }
 
 const REASON_MESSAGES = {
@@ -49,7 +58,7 @@ function ReasonNotice() {
   )
 }
 
-function AuthTabs({ mode }: { mode: AuthShellProps['mode'] }) {
+function AuthTabs() {
   const search = useAuthSearch()
   const tabClass =
     'text-20 font-medium text-foreground transition-colors hover:text-highlight data-[status=active]:text-highlight'
@@ -65,29 +74,45 @@ function AuthTabs({ mode }: { mode: AuthShellProps['mode'] }) {
       <Link to="/cadastro" search={search} className={tabClass}>
         Criar conta
       </Link>
-      <span className="sr-only">
-        {mode === 'login' ? 'Entrar selecionado' : 'Criar conta selecionado'}
-      </span>
     </nav>
   )
 }
 
+function SwitchLink({ mode }: { mode: AuthMode }) {
+  const search = useAuthSearch()
+  const linkClass = 'text-highlight underline-offset-4 hover:underline'
+  return mode === 'login' ? (
+    <>
+      Novo na Kurio?{' '}
+      <Link to="/cadastro" search={search} className={linkClass}>
+        Crie uma conta
+      </Link>
+    </>
+  ) : (
+    <>
+      Já tem uma conta?{' '}
+      <Link to="/login" search={search} className={linkClass}>
+        Entre
+      </Link>
+    </>
+  )
+}
+
 /**
- * Desktop: modal over the home page, as in the Figma file. Mobile: full page.
+ * Shared layout of /login and /cadastro. Desktop: one modal over the home page
+ * (as in the Figma file) that stays open while switching tabs, so focus and
+ * the animation are not reset. Mobile: full page.
  * Closing the modal returns to the page the visitor came from, unless it is a
  * private one (it would send them straight back here).
  */
-export function AuthShell({
-  mode,
-  title,
-  description,
-  children,
-  switchLink,
-}: AuthShellProps) {
+export function AuthShell() {
   const desktop = useMediaQuery(DESKTOP_QUERY)
   const navigate = useNavigate()
+  const matchRoute = useMatchRoute()
   const { redirect } = useAuthSearch()
   const contentRef = useRef<HTMLDivElement>(null)
+  const mode: AuthMode = matchRoute({ to: '/cadastro' }) ? 'register' : 'login'
+  const { title, description } = COPY[mode]
 
   if (desktop) {
     return (
@@ -116,14 +141,16 @@ export function AuthShell({
               mode === 'login' ? 'pb-[5.75rem]' : 'pb-[4.5rem]',
             )}
           >
-            <AuthTabs mode={mode} />
+            <AuthTabs />
             <DialogTitle className="sr-only">{title}</DialogTitle>
             <DialogDescription className="mx-auto mt-[2.375rem] max-w-[21.1875rem] px-4 text-center leading-[1.2] sm:px-0">
               {description}
             </DialogDescription>
             <div className="mx-auto mt-[1.5625rem] w-full max-w-[21.1875rem] px-4 sm:px-0">
               <ReasonNotice />
-              {children('dialog')}
+              <AuthLayoutContext value="dialog">
+                <Outlet />
+              </AuthLayoutContext>
             </div>
             <SocialSignIn layout="dialog" />
           </DialogContent>
@@ -133,7 +160,7 @@ export function AuthShell({
   }
 
   return (
-    <section className="mx-auto w-full max-w-[22.3125rem] px-(--gutter) pt-16 pb-12">
+    <section className="mx-auto w-full max-w-[calc(22.3125rem+2*var(--gutter))] px-(--gutter) pt-16 pb-12">
       <Link
         to="/"
         aria-label="Kurio, página inicial"
@@ -144,11 +171,13 @@ export function AuthShell({
       <h1 className="mt-[5.25rem] text-center text-20 font-bold">{title}</h1>
       <div className="mt-9">
         <ReasonNotice />
-        {children('page')}
+        <AuthLayoutContext value="page">
+          <Outlet />
+        </AuthLayoutContext>
       </div>
       <SocialSignIn layout="page" />
       <p className="mt-11 text-center text-15 text-muted-foreground">
-        {switchLink}
+        <SwitchLink mode={mode} />
       </p>
     </section>
   )

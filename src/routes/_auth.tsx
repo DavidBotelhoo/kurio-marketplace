@@ -1,18 +1,20 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 
-import { ScreenPlaceholder } from '@/components/layout/screen-placeholder'
+import { AuthShell } from '@/features/auth/components/auth-shell'
 import { sessionQueryOptions } from '@/features/auth/queries'
 import { validateAuthSearch } from '@/features/auth/redirect'
 import { sessionStore } from '@/features/auth/session-store'
 
-export const Route = createFileRoute('/cadastro')({
+/** Pathless layout of /login and /cadastro (one modal on desktop). */
+export const Route = createFileRoute('/_auth')({
   validateSearch: validateAuthSearch,
   beforeLoad: async ({ context, search }) => {
     const token = sessionStore.getToken()
     if (!token) return
     const auth = await context.queryClient.query(sessionQueryOptions(token))
+    // Already signed in: go straight to where the flow was heading.
     if (auth) throw redirect({ href: search.redirect ?? '/', replace: true })
   },
-  head: () => ({ meta: [{ title: 'Criar conta | Kurio' }] }),
-  component: () => <ScreenPlaceholder title="Criar perfil de colecionador" />,
+  staticData: { mobileFooter: false },
+  component: AuthShell,
 })

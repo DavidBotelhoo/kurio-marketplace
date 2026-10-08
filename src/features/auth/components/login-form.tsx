@@ -10,7 +10,7 @@ import { applyApiErrors } from '@/lib/forms'
 import { notifyUnavailable } from '@/lib/unavailable'
 
 import { useLoginMutation } from '../queries'
-import type { AuthLayout } from './auth-shell'
+import type { AuthLayout } from './auth-layout-context'
 import { FormAlert } from './form-alert'
 
 interface LoginFormProps {
