@@ -88,7 +88,7 @@ export function DesktopGallery({ nft }: { nft: NftDetail }) {
 /** Mobile: swipeable views with the Figma page indicator over the image. */
 export function MobileGallery({ nft }: { nft: NftDetail }) {
   const views = nft.gallery.length ? nft.gallery : [nft.image]
-  const listRef = useRef<HTMLUListElement>(null)
+  const listRef = useRef<HTMLDivElement>(null)
   const [index, setIndex] = useState(0)
 
   useEffect(() => {
@@ -115,22 +115,27 @@ export function MobileGallery({ nft }: { nft: NftDetail }) {
 
   return (
     <div className="relative">
-      <ul
+      {/* Scrollable region: focusable so the keyboard can scroll it. */}
+      <div
         ref={listRef}
+        role="region"
         aria-label="Vistas do NFT"
-        className="flex snap-x snap-mandatory [scrollbar-width:none] overflow-x-auto rounded-[1.5rem] [&::-webkit-scrollbar]:hidden"
+        tabIndex={0}
+        className="flex snap-x snap-mandatory [scrollbar-width:none] overflow-x-auto rounded-[1.5rem] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring [&::-webkit-scrollbar]:hidden"
       >
-        {views.map((view, viewIndex) => (
-          <li key={view.alt} className="w-full shrink-0 snap-center">
-            <NftImage
-              image={view}
-              sizes="100vw"
-              priority={viewIndex === 0}
-              className="aspect-[361/356] w-full object-cover"
-            />
-          </li>
-        ))}
-      </ul>
+        <ul className="flex">
+          {views.map((view, viewIndex) => (
+            <li key={view.alt} className="w-full shrink-0 snap-center">
+              <NftImage
+                image={view}
+                sizes="100vw"
+                priority={viewIndex === 0}
+                className="aspect-[361/356] w-full object-cover"
+              />
+            </li>
+          ))}
+        </ul>
+      </div>
       {views.length > 1 ? (
         <div className="absolute inset-x-0 bottom-[3.125rem] flex items-center justify-center gap-[0.4375rem]">
           {views.map((view, viewIndex) => (

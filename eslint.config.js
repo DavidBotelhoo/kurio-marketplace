@@ -45,6 +45,15 @@ export default defineConfig([
         'error',
         { allowConstantExport: true, allowExportNames: ['Route'] },
       ],
+      // Scrollable regions (role="region" + name) must be keyboard-focusable.
+      'jsx-a11y-x/no-noninteractive-tabindex': [
+        'error',
+        {
+          tags: [],
+          roles: ['tabpanel', 'region'],
+          allowExpressionValues: true,
+        },
+      ],
       '@typescript-eslint/consistent-type-imports': [
         'error',
         { fixStyle: 'inline-type-imports' },
@@ -82,6 +91,15 @@ export default defineConfig([
           ],
         },
       ],
+    },
+  },
+  {
+    // Playwright tests run in Node; page.evaluate callbacks run in the page.
+    files: ['tests/**/*.ts', 'playwright.config.ts'],
+    languageOptions: { globals: { ...globals.node, ...globals.browser } },
+    rules: {
+      'react-refresh/only-export-components': 'off',
+      'react-hooks/rules-of-hooks': 'off',
     },
   },
   {

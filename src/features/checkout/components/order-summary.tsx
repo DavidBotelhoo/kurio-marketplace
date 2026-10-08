@@ -43,14 +43,14 @@ export function QuoteTotals({
           (-) {formatEth(quote.discountEth)}
         </dd>
       </div>
-      <div className="grid gap-1">
-        <div className="flex items-baseline justify-between gap-4">
-          <dt className="text-15">Taxa de rede</dt>
-          <dd className="text-18 tabular-nums">
-            {formatEth(quote.networkFeeEth)}
-          </dd>
-        </div>
-        <p className="text-center text-12 text-highlight">Taxa estimada</p>
+      <div className="grid grid-cols-[1fr_auto] items-baseline gap-x-4 gap-y-1">
+        <dt className="text-15">Taxa de rede</dt>
+        <dd className="text-18 tabular-nums">
+          {formatEth(quote.networkFeeEth)}
+        </dd>
+        <dd className="col-span-2 text-center text-12 text-highlight">
+          Taxa estimada
+        </dd>
       </div>
       <div className="mt-1 flex items-baseline justify-between gap-4 border-t border-primary/30 px-[2.625rem] pt-5">
         <dt className="text-16 font-bold">Total</dt>

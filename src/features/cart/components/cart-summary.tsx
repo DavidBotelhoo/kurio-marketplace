@@ -25,6 +25,7 @@ function SummaryRow({
   total = false,
   small = false,
   mobile,
+  className,
 }: {
   label: string
   value: string
@@ -33,9 +34,11 @@ function SummaryRow({
   /** Figma discount value: 15px (fits next to its long label). */
   small?: boolean
   mobile: boolean
+  className?: string
 }) {
   return (
-    <div className="flex items-start justify-between gap-4">
+    // A dt/dd group: the only element a <dl> accepts as a child.
+    <div className={cn('flex items-start justify-between gap-4', className)}>
       <dt className={total ? 'text-16 font-bold' : 'text-15'}>{label}</dt>
       <dd className="text-right">
         <span
@@ -95,14 +98,13 @@ export function CartSummary({ cart, variant }: CartSummaryProps) {
           value={formatEth(quote.networkFeeEth)}
           note="Taxa estimada"
         />
-        <div className="mt-2.5">
-          <SummaryRow
-            mobile={mobile}
-            total
-            label="Total"
-            value={formatEth(quote.totalEth)}
-          />
-        </div>
+        <SummaryRow
+          mobile={mobile}
+          total
+          label="Total"
+          value={formatEth(quote.totalEth)}
+          className="mt-2.5"
+        />
       </dl>
     )
   } else if (quoteQuery.isError) {
