@@ -15,7 +15,7 @@ export default defineConfig([
     'coverage',
     'playwright-report',
     'test-results',
-    'lighthouse-reports',
+    'docs/lighthouse',
     'public/mockServiceWorker.js',
     'src/routeTree.gen.ts',
   ]),
@@ -101,6 +101,10 @@ export default defineConfig([
       'react-refresh/only-export-components': 'off',
       'react-hooks/rules-of-hooks': 'off',
     },
+  },
+  {
+    files: ['scripts/**/*.ts', '*.config.ts'],
+    languageOptions: { globals: globals.node },
   },
   {
     files: ['**/*.js'],

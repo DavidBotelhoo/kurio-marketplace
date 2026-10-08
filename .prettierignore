@@ -2,7 +2,7 @@ dist
 coverage
 playwright-report
 test-results
-lighthouse-reports
+docs/lighthouse
 pnpm-lock.yaml
 public/mockServiceWorker.js
 src/routeTree.gen.ts
