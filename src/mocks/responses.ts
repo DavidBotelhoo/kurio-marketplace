@@ -11,6 +11,7 @@ const MESSAGES: Record<ApiErrorCode, string> = {
   NOT_FOUND: 'Recurso não encontrado.',
   CONFLICT: 'Os dados mudaram desde a última consulta.',
   AVAILABILITY_CONFLICT: 'Quantidade indisponível para esta edição.',
+  WALLET_REJECTED: 'A conexão foi recusada na carteira.',
   RATE_LIMITED: 'Muitas tentativas. Aguarde um instante e tente novamente.',
   SERVER_ERROR: 'Erro interno do servidor.',
   SERVICE_UNAVAILABLE: 'Serviço temporariamente indisponível.',

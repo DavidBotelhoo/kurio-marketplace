@@ -20,6 +20,7 @@ import { DEMO_CREDENTIALS } from '../demo-credentials'
 import { listOperations } from '../operations'
 import { RealtimeSection } from './realtime-section'
 import { SessionSection } from './session-section'
+import { WalletSection } from './wallet-section'
 
 const selectClass =
   'h-9 w-full rounded-sm border border-input bg-background px-2 text-13 text-foreground focus-visible:border-primary focus-visible:outline-none'
@@ -329,6 +330,10 @@ export function MockPanel() {
 
           <Section title="Tempo real">
             <RealtimeSection />
+          </Section>
+
+          <Section title="Carteira">
+            <WalletSection />
           </Section>
 
           <Section title="Usuários de teste">

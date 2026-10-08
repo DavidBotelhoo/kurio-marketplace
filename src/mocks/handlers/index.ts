@@ -4,6 +4,7 @@ import { catalogHandlers } from './catalog'
 import { favoritesHandlers } from './favorites'
 import { realtimeHandlers } from '../realtime/handler'
 import { systemHandlers } from './system'
+import { walletsHandlers } from './wallets'
 
 export const handlers = [
   ...systemHandlers,
@@ -11,5 +12,6 @@ export const handlers = [
   ...catalogHandlers,
   ...favoritesHandlers,
   ...cartHandlers,
+  ...walletsHandlers,
   ...realtimeHandlers,
 ]

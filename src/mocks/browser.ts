@@ -15,6 +15,7 @@ import {
 import { activeSessionCount, expireAllSessions } from './auth'
 import { db } from './db/database'
 import { expireCoupon } from './domain/cart'
+import { disconnectAllWallets } from './domain/wallets'
 import { changeNftPrice, setEditionAvailability } from './domain/catalog'
 import type { MockDatabase } from './db/schema'
 import { handlers } from './handlers'
@@ -83,6 +84,12 @@ export interface KurioMocksApi {
     /** Makes a coupon expire now (applied coupons stop discounting). */
     expire: typeof expireCoupon
   }
+  wallets: {
+    /** Answer of the simulated extension to the next connection prompts. */
+    setApproval: (mode: MockConfig['walletApproval']) => void
+    /** Drops every wallet connection (as if the extension disconnected). */
+    disconnectAll: () => void
+  }
   /** Server-side realtime controls; events reach the app via socket.io-client. */
   realtime: {
     changePrice: typeof changeNftPrice
@@ -134,6 +141,12 @@ export async function startMocks(overrides: MockUrlOverrides) {
       activeSessions: activeSessionCount,
     },
     coupons: { expire: expireCoupon },
+    wallets: {
+      setApproval: (mode) => {
+        updateMockConfig({ walletApproval: mode })
+      },
+      disconnectAll: disconnectAllWallets,
+    },
     realtime: {
       changePrice: changeNftPrice,
       setAvailability: setEditionAvailability,

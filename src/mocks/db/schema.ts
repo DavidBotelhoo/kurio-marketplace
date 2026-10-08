@@ -1,4 +1,5 @@
 import type { CategoryId, NetworkId } from '@/contracts/catalog'
+import type { WalletProviderId, WalletSlot } from '@/contracts/wallet-providers'
 
 /*
  * Records persisted by the mock database. They model what a backend would
@@ -6,7 +7,7 @@ import type { CategoryId, NetworkId } from '@/contracts/catalog'
  */
 
 /** Bump whenever record shapes change; stale snapshots are reseeded. */
-export const DB_VERSION = 7
+export const DB_VERSION = 8
 
 /**
  * Seed variants: "default" is the full catalog; "empty-catalog" keeps users
@@ -136,6 +137,38 @@ export interface QuoteRecord {
   totalEth: string
 }
 
+export interface WalletRecord {
+  id: string
+  userId: string
+  slot: WalletSlot
+  nickname: string
+  displayName: string
+  profileName: string
+  network: NetworkId
+  address: string
+  secondaryAddress: string | null
+  provider: WalletProviderId
+  referralCode: string
+  email: string
+  ensName: string
+  createdAt: string
+  updatedAt: string
+}
+
+/** Simulated wallet-extension session approved by the collector. */
+export interface WalletConnectionRecord {
+  id: string
+  userId: string
+  walletId: string | null
+  provider: WalletProviderId
+  network: NetworkId
+  address: string
+  connectedAt: string
+  expiresAt: string
+  /** Set by a disconnect (collector, panel or tests). */
+  revokedAt: string | null
+}
+
 export interface MockDatabase {
   /** Bumped whenever the record shapes change; older snapshots are reseeded. */
   version: number
@@ -148,4 +181,6 @@ export interface MockDatabase {
   carts: CartRecord[]
   coupons: CouponRecord[]
   quotes: QuoteRecord[]
+  wallets: WalletRecord[]
+  walletConnections: WalletConnectionRecord[]
 }

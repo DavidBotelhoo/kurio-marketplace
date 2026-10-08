@@ -1,6 +1,7 @@
 import { cartLineId, maxQuantity } from '../domain/cart-rules'
 import { createCatalogFixtures } from '../fixtures/catalog'
 import { COUPONS } from '../fixtures/coupons'
+import { WALLETS } from '../fixtures/wallets'
 import { SEED_DATE, USERS } from '../fixtures/users'
 import {
   type CartRecord,
@@ -71,5 +72,7 @@ export function createSeed(dataset: DatasetId): MockDatabase {
     carts: nfts.length ? [seedCart(nfts)] : [],
     coupons: structuredClone([...COUPONS]),
     quotes: [],
+    wallets: structuredClone([...WALLETS]),
+    walletConnections: [],
   }
 }

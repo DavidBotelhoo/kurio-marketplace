@@ -62,6 +62,8 @@ export const mockConfigSchema = z.object({
   sessionTtlSeconds: z.int().check(z.positive()),
   /** Shows the floating control panel (hidden in visual regression tests). */
   panel: z.boolean(),
+  /** Answer of the simulated wallet extension to connection prompts. */
+  walletApproval: z.enum(['approve', 'reject']),
 })
 
 export type MockConfig = z.infer<typeof mockConfigSchema>
@@ -75,6 +77,7 @@ export const DEFAULT_CONFIG: MockConfig = {
   seed: 2026,
   sessionTtlSeconds: 8 * 60 * 60,
   panel: true,
+  walletApproval: 'approve',
 }
 
 interface ScenarioPreset {
@@ -138,6 +141,12 @@ export const SCENARIO_PRESETS = {
     description:
       'Sessões expiram 60 s após o login: a próxima ação privada pede novo login e retoma o fluxo.',
     config: { sessionTtlSeconds: 60 },
+  },
+  'wallet-rejected': {
+    label: 'Carteira recusa conexão',
+    description:
+      'A extensão simulada recusa os pedidos de conexão até o cenário mudar.',
+    config: { walletApproval: 'reject' },
   },
   'server-errors': {
     label: 'Erros no servidor',
