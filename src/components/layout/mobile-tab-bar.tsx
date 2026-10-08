@@ -1,5 +1,5 @@
 import { Link, type LinkProps } from '@tanstack/react-router'
-import type { ComponentType } from 'react'
+import type { ComponentType, ReactNode } from 'react'
 
 import {
   HeartFilledIcon,
@@ -10,6 +10,9 @@ import {
   type IconProps,
 } from '@/components/icons'
 import { UnavailableAction } from '@/components/unavailable-action'
+import { CartBadge } from '@/features/cart/components/cart-badge'
+import { cartLabel } from '@/features/cart/labels'
+import { useCartCount } from '@/features/cart/queries'
 
 /** Height of the bar, reserved at the bottom of pages that show it. */
 export const MOBILE_TAB_BAR_HEIGHT = '5.9375rem'
@@ -25,9 +28,17 @@ interface TabProps {
   /** Icon size from the Figma frame (icons have square view boxes). */
   iconClassName: string
   exact?: boolean
+  badge?: ReactNode
 }
 
-function Tab({ to, label, Icon, iconClassName, exact = false }: TabProps) {
+function Tab({
+  to,
+  label,
+  Icon,
+  iconClassName,
+  exact = false,
+  badge,
+}: TabProps) {
   return (
     <Link
       to={to}
@@ -35,7 +46,10 @@ function Tab({ to, label, Icon, iconClassName, exact = false }: TabProps) {
       activeOptions={{ exact }}
       className="grid h-12 place-items-center text-muted-foreground transition-colors data-[status=active]:text-highlight"
     >
-      <Icon className={iconClassName} />
+      <span className="relative grid place-items-center">
+        <Icon className={iconClassName} />
+        {badge}
+      </span>
     </Link>
   )
 }
@@ -45,6 +59,7 @@ function Tab({ to, label, Icon, iconClassName, exact = false }: TabProps) {
  * segment between two flexible bars, so the shape holds for any phone width.
  */
 export function MobileTabBar() {
+  const cartCount = useCartCount()
   return (
     <nav
       aria-label="Navegação principal"
@@ -96,9 +111,10 @@ export function MobileTabBar() {
         <li>
           <Tab
             to="/carrinho"
-            label="Carrinho"
+            label={cartLabel(cartCount)}
             Icon={ShopIcon}
             iconClassName="size-[1.1rem]"
+            badge={<CartBadge count={cartCount} className="-top-2 -right-3" />}
           />
         </li>
         <li>

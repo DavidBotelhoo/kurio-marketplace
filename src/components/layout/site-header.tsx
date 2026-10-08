@@ -3,6 +3,9 @@ import { Link, useLocation } from '@tanstack/react-router'
 import { CartIcon, SearchIcon } from '@/components/icons'
 import { UnavailableAction } from '@/components/unavailable-action'
 import { AccountActions } from '@/features/auth/components/account-actions'
+import { CartBadge } from '@/features/cart/components/cart-badge'
+import { cartLabel } from '@/features/cart/labels'
+import { useCartCount } from '@/features/cart/queries'
 import { CATALOG_ANCHOR } from '@/features/catalog/components/catalog-anchor'
 import { cn } from '@/lib/utils'
 
@@ -67,6 +70,7 @@ function MainNav() {
 }
 
 function HeaderActions() {
+  const cartCount = useCartCount()
   return (
     <div className="flex items-center gap-7">
       <Link
@@ -80,10 +84,11 @@ function HeaderActions() {
       </Link>
       <Link
         to="/carrinho"
-        aria-label="Carrinho"
+        aria-label={cartLabel(cartCount)}
         className="relative text-foreground transition-colors hover:text-highlight"
       >
         <CartIcon className="size-6" />
+        <CartBadge count={cartCount} />
       </Link>
       <AccountActions />
     </div>
