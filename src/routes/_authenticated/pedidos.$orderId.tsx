@@ -4,6 +4,6 @@ import { OrderPage } from '@/features/orders/order-page'
 
 export const Route = createFileRoute('/_authenticated/pedidos/$orderId')({
   head: () => ({ meta: [{ title: 'Confirmação de pedido | Kurio' }] }),
-  staticData: { mobileTabBar: true },
+  staticData: { mobileFooter: false },
   component: OrderPage,
 })
