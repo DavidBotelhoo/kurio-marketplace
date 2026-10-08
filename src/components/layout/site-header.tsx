@@ -1,4 +1,5 @@
 import { Link, useLocation } from '@tanstack/react-router'
+import { lazy, Suspense } from 'react'
 
 import { CartIcon, SearchIcon } from '@/components/icons'
 import { UnavailableAction } from '@/components/unavailable-action'
@@ -7,7 +8,13 @@ import { CartBadge } from '@/features/cart/components/cart-badge'
 import { cartLabel } from '@/features/cart/labels'
 import { useCartCount } from '@/features/cart/queries'
 import { CATALOG_ANCHOR } from '@/features/catalog/components/catalog-anchor'
+import { DESKTOP_QUERY, useMediaQuery } from '@/hooks/use-media-query'
 import { cn } from '@/lib/utils'
+
+import { searchTriggerClass } from './header-search-trigger'
+
+// The search field and its data layer load on demand, outside the entry chunk.
+const HeaderSearch = lazy(() => import('./header-search'))
 
 const MARKET_PATHS = /^\/(nfts|carrinho|pagamento|pedidos)(\/|$)/
 
@@ -73,17 +80,21 @@ function MainNav() {
 
 function HeaderActions() {
   const cartCount = useCartCount()
+  // The header (and its search) only exists from md on.
+  const desktop = useMediaQuery(DESKTOP_QUERY)
   return (
     <div className="flex items-center gap-7">
-      <Link
-        to="/"
-        hash={CATALOG_ANCHOR}
-        state={{ focusSearch: true }}
-        aria-label="Buscar NFTs"
-        className="text-foreground transition-colors hover:text-highlight"
-      >
-        <SearchIcon className="size-5" />
-      </Link>
+      {desktop ? (
+        <Suspense
+          fallback={
+            <span aria-hidden="true" className={searchTriggerClass}>
+              <SearchIcon className="size-5" />
+            </span>
+          }
+        >
+          <HeaderSearch />
+        </Suspense>
+      ) : null}
       <Link
         to="/carrinho"
         aria-label={cartLabel(cartCount)}

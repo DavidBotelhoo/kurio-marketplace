@@ -1,10 +1,11 @@
-import { useLocation, useRouter } from '@tanstack/react-router'
+import { useRouter } from '@tanstack/react-router'
 import { useEffect, useId, useRef, useState } from 'react'
 
 import { SearchIcon } from '@/components/icons'
 import { cn } from '@/lib/utils'
 
 import { useCatalogNavigate, useCatalogSearch } from '../hooks/use-catalog'
+import { CATALOG_ANCHOR } from './catalog-anchor'
 import {
   type CatalogSearch,
   validateCatalogSearch,
@@ -13,20 +14,29 @@ import {
 
 const DEBOUNCE_MS = 350
 
+interface CatalogSearchFieldProps {
+  className?: string
+  /** Scroll to the results while searching (the header search, any page). */
+  revealResults?: boolean
+  /** After Enter, once the search is applied. */
+  onSubmitted?: () => void
+}
+
 /**
  * Debounced catalog search. Typing replaces the history entry (no entry per
  * keystroke); external URL changes (back/forward, clearing filters) are
  * mirrored into the field.
  */
-export function CatalogSearchField({ className }: { className?: string }) {
+export function CatalogSearchField({
+  className,
+  revealResults = false,
+  onSubmitted,
+}: CatalogSearchFieldProps) {
   const search = useCatalogSearch()
   const navigateCatalog = useCatalogNavigate()
   const router = useRouter()
-  const wantsFocus = useLocation({
-    select: (location) => location.state.focusSearch === true,
-  })
+  const hash = revealResults ? CATALOG_ANCHOR : undefined
   const id = useId()
-  const inputRef = useRef<HTMLInputElement>(null)
   const [value, setValue] = useState(search.q ?? '')
   const submitted = useRef(search.q ?? '')
   const latestSearch = useRef<CatalogSearch>(search)
@@ -55,20 +65,13 @@ export function CatalogSearchField({ className }: { className?: string }) {
       submitted.current = q
       navigateCatalog(
         withFilters(latestSearch.current, { q: q || undefined }),
-        {
-          replace: true,
-        },
+        { replace: true, hash },
       )
     }, DEBOUNCE_MS)
     return () => {
       clearTimeout(timer)
     }
-  }, [value, navigateCatalog])
-
-  // The header search button navigates here asking for focus.
-  useEffect(() => {
-    if (wantsFocus) inputRef.current?.focus()
-  }, [wantsFocus])
+  }, [value, navigateCatalog, hash])
 
   return (
     <form
@@ -80,7 +83,9 @@ export function CatalogSearchField({ className }: { className?: string }) {
         submitted.current = q
         navigateCatalog(
           withFilters(latestSearch.current, { q: q || undefined }),
+          { hash },
         )
+        onSubmitted?.()
       }}
     >
       <label htmlFor={id} className="sr-only">
@@ -91,7 +96,6 @@ export function CatalogSearchField({ className }: { className?: string }) {
         className="pointer-events-none absolute top-1/2 left-3.5 size-[1.125rem] -translate-y-1/2 text-subtle-foreground"
       />
       <input
-        ref={inputRef}
         id={id}
         type="search"
         enterKeyHint="search"

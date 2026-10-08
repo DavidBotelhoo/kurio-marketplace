@@ -23,8 +23,11 @@ test.describe('Catálogo', () => {
     const grid = page.locator('#mercado article')
     await expect(grid.first()).toBeVisible()
 
-    // Search: debounced, kept in the URL, results match the API.
+    // Search (header icon, as in the Figma frame): debounced, kept in the
+    // URL, results match the API.
+    await page.getByRole('button', { name: 'Buscar NFTs' }).click()
     await page.getByRole('searchbox', { name: 'Buscar NFTs' }).fill('nomad')
+    await page.keyboard.press('Enter')
     await expect(page).toHaveURL(/q=nomad/)
     await expect
       .poll(() => names(page))

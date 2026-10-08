@@ -4,10 +4,12 @@ import { ActiveFilters, CatalogTabs, SortSelect } from './catalog-toolbar'
 import { CATALOG_ANCHOR } from './catalog-anchor'
 import { CatalogFilters } from './catalog-filters'
 import { CatalogResults } from './catalog-results'
-import { CatalogSearchField } from './catalog-search-field'
 
 interface CatalogSectionProps {
-  /** Sidebar layout (≥1024px); smaller screens use the search bar + drawer. */
+  /**
+   * Sidebar layout (≥1024px, search from the header as in the Figma frame);
+   * smaller screens use the search bar + drawer.
+   */
   desktop: boolean
   /** Rendered under the filters on desktop ("NFT em destaque"). */
   sidebarExtra?: ReactNode
@@ -26,11 +28,10 @@ export function CatalogSection({ desktop, sidebarExtra }: CatalogSectionProps) {
       <div className="lg:grid lg:grid-cols-[19.375rem_minmax(0,1fr)] lg:items-start lg:gap-12">
         {desktop ? (
           <aside
-            aria-label="Busca e filtros do catálogo"
-            className="grid gap-12"
+            aria-label="Filtros do catálogo"
+            className="grid gap-12 xl:mt-1.5"
           >
-            <div className="grid gap-10 bg-card px-5 pt-[1.125rem] pb-10">
-              <CatalogSearchField />
+            <div className="bg-card px-5 pt-4 pb-10">
               <CatalogFilters />
             </div>
             {sidebarExtra}

@@ -33,11 +33,6 @@ declare module '@tanstack/react-router' {
     router: AppRouter
   }
 
-  interface HistoryState {
-    /** Set by the header search button: focus the catalog search field. */
-    focusSearch?: boolean
-  }
-
   interface StaticDataRouteOption {
     /** Shows the bottom tab bar on mobile (top-level sections only). */
     mobileTabBar?: boolean

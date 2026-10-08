@@ -20,14 +20,21 @@ export function useCatalogSearch(): CatalogSearch {
   return useSearch({ from: '/', shouldThrow: false }) ?? DEFAULT_SEARCH
 }
 
-/** Navigates to a new catalog state without jumping to the top of the page. */
+/**
+ * Navigates to a new catalog state without jumping to the top of the page;
+ * `hash` scrolls to that anchor instead (the results, from another page).
+ */
 export function useCatalogNavigate() {
   const navigate = useNavigate()
   return useCallback(
-    (search: CatalogSearch, options: { replace?: boolean } = {}) => {
+    (
+      search: CatalogSearch,
+      options: { replace?: boolean; hash?: string } = {},
+    ) => {
       void navigate({
         to: '/',
         search,
+        hash: options.hash,
         resetScroll: false,
         replace: options.replace ?? false,
       })
