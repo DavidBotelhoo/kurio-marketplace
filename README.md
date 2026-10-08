@@ -3,7 +3,7 @@
 Marketplace de NFTs em React e TypeScript: descoberta, compra e conta do colecionador, nos layouts desktop e mobile. API REST, autenticação, carteiras, pagamentos e eventos em tempo real rodam sobre uma API simulada com MSW, sem backend.
 
 - Repositório: https://github.com/DavidBotelhoo/kurio-marketplace
-- Demonstração: _(URL publicada no deploy)_
+- Demonstração: https://kurio-marketplace-sigma.vercel.app
 - Arquitetura, contratos e decisões: [ARCHITECTURE.md](ARCHITECTURE.md)
 - Performance e Lighthouse: [docs/performance.md](docs/performance.md)
 
@@ -194,4 +194,6 @@ docs/          relatórios e análise de performance
 
 ## Deploy
 
-O build é estático (`dist/`). Em `vercel.json`, todas as rotas reescrevem para `index.html` (acesso direto e refresh funcionam) e `/assets` tem cache imutável. A API simulada roda no navegador, inclusive na versão publicada.
+Publicado na Vercel em https://kurio-marketplace-sigma.vercel.app, com deploy automático a cada push no `main` (preset Vite, `pnpm build`, saída `dist/`, sem variáveis extras: o `.env` versionado ativa os mocks).
+
+O build é estático. Em `vercel.json`, todas as rotas reescrevem para `index.html` (acesso direto e refresh funcionam) e `/assets` tem cache imutável. A API simulada e o Socket.IO simulado rodam no navegador, inclusive na versão publicada; cada visitante tem seus próprios dados, e "Restaurar dados" no painel volta ao estado inicial.
