@@ -205,10 +205,12 @@ Ajustes em relação ao layout:
 
 - Login e cadastro são um modal sobre o início no desktop e uma página no mobile, como no Figma. Concluir leva ao destino do `redirect`; fechar o modal volta à página de origem (ou ao início, se ela for privada).
 - Ações fora do escopo (páginas editoriais, suporte, ofertas, downloads, login social) existem no layout, mas mostram "não está disponível nesta demonstração" e nunca simulam sucesso.
+- Busca: no desktop, a lupa do header (como no Figma) abre o campo de busca em qualquer página; digitar atualiza o catálogo do início e rola até os resultados, Enter fecha o campo. No celular e no tablet, a barra "Explorar coleções" fica no topo do início, como no frame mobile.
 - Filtros ativos aparecem como chips removíveis acima dos resultados (não estão no Figma), com "Limpar filtros".
 - O "NFT em destaque" exibe nome e preço sobre a arte (não estão no Figma): sem eles, a oferta não diria o que nem quanto.
 - Remoção de item do carrinho com "Desfazer".
 - O carrossel do hero troca de destaque pelos pontos ou arrastando a arte (toque, caneta ou mouse); o gesto não abre o NFT e o scroll vertical da página continua funcionando. Não há rotação automática.
+- Os carrosséis com rolagem (relacionados, recomendações do carrinho, galeria mobile) rolam nativamente com toque, trackpad e teclado, e também podem ser arrastados com o mouse: ao soltar, assentam no item mais próximo, e um arraste nunca abre o card.
 - Mudanças em tempo real piscam o valor alterado (sem animação com movimento reduzido) e são anunciadas.
 - Telas sem frame (confirmação mobile, perfil e carteiras no mobile, estados de erro, vazio e carregamento, revisão do pedido, estados de conexão da carteira) seguem os componentes e tokens do design.
 
@@ -216,6 +218,7 @@ Ajustes em relação ao layout:
 
 - Detalhe: os valores de "Contrato" e "Direitos autorais" estavam trocados no Figma; foram corrigidos.
 - O arquivo tem só 4 ilustrações (`design/assets/images`). Os 36 NFTs das fixtures as reutilizam, e os relacionados podem repetir a arte do NFT aberto.
+- Detalhe desktop: a linha de disponibilidade da edição (que não existe no Figma) fica ao lado dos chips, para a coluna de compra ocupar a mesma altura da galeria.
 - Detalhe mobile: inclui seções do desktop que o frame mobile não tem (abas de informações e relacionados), além da linha de status da edição (disponibilidade e limite por pedido).
 - Carrinho: chip da edição em cada linha; desconto sempre exibido no resumo (`(-) 0.00 ETH` sem cupom); posição do ícone de lixeira ajustada no mobile; recomendações só a partir de 768 px.
 - Pagamento: seleção de rede também no mobile; indicação e ENS obrigatórios conforme o layout; diálogo de revisão e estados de conexão da carteira, que não existem no Figma.
