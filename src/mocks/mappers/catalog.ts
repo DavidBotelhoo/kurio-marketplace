@@ -9,8 +9,49 @@ import { artworkImage as createArtworkImage } from '@/lib/artwork-image'
 
 import type { ArtworkId, EditionRecord, NftRecord } from '../db/schema'
 import { ARTWORKS, COLLECTIONS } from '../fixtures/catalog'
+import { createRandom, hashString, pick } from '../random'
 
 const ROYALTY_PERCENT = 5
+
+const REVIEW_AUTHORS = [
+  'Ana Prado',
+  'Caio Mendes',
+  'Bia Tavares',
+  'Rui Matsuda',
+  'Lia Fontes',
+  'Téo Brandão',
+  'Maya Duarte',
+] as const
+
+const REVIEW_COMMENTS = [
+  'A arte em alta resolução é ainda mais bonita do que na prévia. Entrega e verificação sem complicação.',
+  'Acompanho a coleção desde o primeiro lançamento e esta peça é uma das mais bem acabadas.',
+  'Os lançamentos exclusivos para colecionadores já valeram a compra.',
+  'Procedência clara e metadados completos. Recomendo para quem está começando.',
+  'Detalhes de luz e textura impecáveis. Combina com o restante da minha coleção.',
+  'Curadoria excelente. Fiquei de olho na próxima edição.',
+] as const
+
+/** A few recent reviews, deterministic per NFT, around its average rating. */
+function createReviews(record: NftRecord) {
+  const random = createRandom(hashString(`reviews:${record.id}`))
+  const count = Math.min(3, record.rating.count)
+  return Array.from({ length: count }, (_, index) => {
+    const rating = Math.min(
+      5,
+      Math.max(1, Math.round(record.rating.average) - (index === 2 ? 1 : 0)),
+    )
+    return {
+      id: `${record.id}-review-${String(index + 1)}`,
+      author: pick(random, REVIEW_AUTHORS),
+      rating,
+      comment: pick(random, REVIEW_COMMENTS),
+      createdAt: new Date(
+        Date.parse(record.listedAt) + (index + 1) * 2 * 86_400_000,
+      ).toISOString(),
+    }
+  }).reverse()
+}
 
 export function artworkImage(
   artwork: ArtworkId,
@@ -51,6 +92,7 @@ export function toNftSummary(record: NftRecord): NftSummary {
     category: record.category,
     network: record.network,
     image: artworkImage(record.artwork),
+    defaultEditionId: record.defaultEditionId,
     priceEth: displayPrice(record),
     compareAtPriceEth: record.compareAtPriceEth,
     rarity: record.rarity,
@@ -89,6 +131,7 @@ export function toNftDetail(record: NftRecord): NftDetail {
     ],
     attributes: record.attributes,
     rating: record.rating,
+    reviews: createReviews(record),
     // The file has a single artwork per NFT; the gallery repeats it as in Figma.
     gallery: [1, 2, 3, 4].map((view) =>
       artworkImage(
@@ -97,7 +140,6 @@ export function toNftDetail(record: NftRecord): NftDetail {
       ),
     ),
     editions: record.editions.map(toEdition),
-    defaultEditionId: record.defaultEditionId,
     creator: { name: collection.creator, royaltyPercent: ROYALTY_PERCENT },
     contract: {
       address: record.contractAddress,

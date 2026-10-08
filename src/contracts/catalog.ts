@@ -57,7 +57,7 @@ export const editionSchema = z.object({
   supply: z.nullable(z.int()),
   /** Units left; null means unlimited (open edition). */
   available: z.nullable(z.int()),
-  /** Largest quantity accepted in a single order. */
+  /** Largest quantity accepted in a single order (never above `available`). */
   maxPerOrder: z.int(),
   priceEth: ethAmountSchema,
   status: availabilitySchema,
@@ -74,6 +74,8 @@ export const nftSummarySchema = z.object({
   category: categoryIdSchema,
   network: networkIdSchema,
   image: imageSchema,
+  /** Edition shown by default (cards add this one to the cart). */
+  defaultEditionId: z.string(),
   /** Price of the default edition. */
   priceEth: ethAmountSchema,
   /** Previous price, shown struck through when present. */
@@ -90,14 +92,26 @@ export const nftSummarySchema = z.object({
 
 export type NftSummary = z.infer<typeof nftSummarySchema>
 
+export const reviewSchema = z.object({
+  id: z.string(),
+  author: z.string(),
+  /** 1 to 5 stars. */
+  rating: z.int(),
+  comment: z.string(),
+  createdAt: isoDateTimeSchema,
+})
+
+export type Review = z.infer<typeof reviewSchema>
+
 export const nftDetailSchema = z.extend(nftSummarySchema, {
   description: z.string(),
   story: z.array(z.string()),
   attributes: z.array(z.string()),
   rating: z.object({ average: z.number(), count: z.int() }),
+  /** Most recent reviews (up to 3 of `rating.count`). */
+  reviews: z.array(reviewSchema),
   gallery: z.array(imageSchema),
   editions: z.array(editionSchema),
-  defaultEditionId: z.string(),
   creator: z.object({ name: z.string(), royaltyPercent: z.number() }),
   contract: z.object({
     address: z.string(),
