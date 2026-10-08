@@ -11,5 +11,16 @@ export function createSeed(dataset: DatasetId): MockDatabase {
     users: structuredClone([...USERS]),
     sessions: [],
     nfts: dataset === 'empty-catalog' ? [] : createCatalogFixtures(),
+    // Nova starts with one favorite (shown as a filled heart in Figma).
+    favorites:
+      dataset === 'empty-catalog'
+        ? []
+        : [
+            {
+              userId: 'usr_nova',
+              nftId: 'emerald-ape-042',
+              createdAt: SEED_DATE,
+            },
+          ],
   }
 }

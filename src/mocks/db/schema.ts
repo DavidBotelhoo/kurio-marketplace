@@ -6,7 +6,7 @@ import type { CategoryId, NetworkId } from '@/contracts/catalog'
  */
 
 /** Bump whenever record shapes change; stale snapshots are reseeded. */
-export const DB_VERSION = 4
+export const DB_VERSION = 5
 
 /**
  * Seed variants: "default" is the full catalog; "empty-catalog" keeps users
@@ -77,6 +77,12 @@ export interface SessionRecord {
   revokedAt: string | null
 }
 
+export interface FavoriteRecord {
+  userId: string
+  nftId: string
+  createdAt: string
+}
+
 export interface MockDatabase {
   /** Bumped whenever the record shapes change; older snapshots are reseeded. */
   version: number
@@ -85,4 +91,5 @@ export interface MockDatabase {
   users: UserRecord[]
   sessions: SessionRecord[]
   nfts: NftRecord[]
+  favorites: FavoriteRecord[]
 }
