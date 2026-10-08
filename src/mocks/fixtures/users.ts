@@ -10,7 +10,7 @@ export const SEED_DATE = '2026-09-01T12:00:00.000Z'
 export const USERS: readonly UserRecord[] = [
   {
     id: 'usr_nova',
-    email: 'nova@kurio.dev',
+    email: 'nova@kurio.test',
     username: 'nova.ribeiro',
     displayName: 'Nova Ribeiro',
     ensName: 'nova.kurio',
@@ -23,7 +23,7 @@ export const USERS: readonly UserRecord[] = [
   },
   {
     id: 'usr_rafa',
-    email: 'rafa@kurio.dev',
+    email: 'rafa@kurio.test',
     username: 'rafa.lima',
     displayName: 'Rafa Lima',
     ensName: null,
