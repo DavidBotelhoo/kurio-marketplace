@@ -321,7 +321,7 @@ function settle(orderId: string) {
       failure: {
         code: 'payment-declined',
         message:
-          'O pagamento foi recusado pela carteira. Nenhum valor foi cobrado e seus itens continuam no carrinho.',
+          'O pagamento foi recusado pela carteira. Nenhum valor foi cobrado.',
       },
     }
   } else if (short) {
