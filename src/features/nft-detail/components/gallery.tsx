@@ -85,7 +85,7 @@ export function DesktopGallery({ nft }: { nft: NftDetail }) {
   )
 }
 
-/** Mobile: swipeable views with the Figma page indicator over the image. */
+/** Mobile: swipeable views with the Figma position indicator over the image. */
 export function MobileGallery({ nft }: { nft: NftDetail }) {
   const views = nft.gallery.length ? nft.gallery : [nft.image]
   const listRef = useRef<HTMLDivElement>(null)
@@ -103,16 +103,6 @@ export function MobileGallery({ nft }: { nft: NftDetail }) {
     }
   }, [])
 
-  const show = (viewIndex: number) => {
-    const list = listRef.current
-    if (!list) return
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    list.scrollTo({
-      left: viewIndex * list.clientWidth,
-      behavior: reduce ? 'auto' : 'smooth',
-    })
-  }
-
   return (
     <div className="relative">
       {/* Scrollable region: focusable so the keyboard can scroll it. */}
@@ -123,7 +113,9 @@ export function MobileGallery({ nft }: { nft: NftDetail }) {
         tabIndex={0}
         className="flex snap-x snap-mandatory [scrollbar-width:none] overflow-x-auto rounded-[1.5rem] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring [&::-webkit-scrollbar]:hidden"
       >
-        <ul className="flex">
+        {/* Full width up front: the views must not wait for the images to
+            get their size (layout shift). */}
+        <ul className="flex w-full">
           {views.map((view, viewIndex) => (
             <li key={view.alt} className="w-full shrink-0 snap-center">
               <NftImage
@@ -136,19 +128,19 @@ export function MobileGallery({ nft }: { nft: NftDetail }) {
           ))}
         </ul>
       </div>
+      {/* Position indicator only: 7px dots 7px apart are too small to be
+          touch targets (WCAG 2.5.8). Views change by swipe or, with the
+          region focused, the arrow keys. */}
       {views.length > 1 ? (
-        <div className="absolute inset-x-0 bottom-[3.125rem] flex items-center justify-center gap-[0.4375rem]">
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 bottom-[3.125rem] flex items-center justify-center gap-[0.4375rem]"
+        >
           {views.map((view, viewIndex) => (
-            <button
+            <span
               key={view.alt}
-              type="button"
-              aria-label={`Mostrar vista ${String(viewIndex + 1)} de ${String(views.length)}`}
-              aria-current={viewIndex === index ? 'true' : undefined}
-              onClick={() => {
-                show(viewIndex)
-              }}
               className={cn(
-                'relative h-[0.4375rem] cursor-pointer rounded-full bg-primary transition-[width] after:absolute after:-inset-2 motion-reduce:transition-none',
+                'h-[0.4375rem] rounded-full bg-primary transition-[width] motion-reduce:transition-none',
                 viewIndex === index ? 'w-7' : 'w-[0.4375rem]',
               )}
             />

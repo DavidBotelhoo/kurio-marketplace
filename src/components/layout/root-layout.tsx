@@ -1,4 +1,9 @@
-import { HeadContent, Outlet, useMatches } from '@tanstack/react-router'
+import {
+  HeadContent,
+  Outlet,
+  useMatches,
+  useRouterState,
+} from '@tanstack/react-router'
 import { lazy, Suspense } from 'react'
 
 import {
@@ -40,6 +45,11 @@ export function RootLayout() {
     select: (matches) =>
       matches.some((match) => match.staticData.mobileFooter === false),
   })
+  // Until the first page renders, the footer would sit right below the
+  // header and then jump down when the content arrives (layout shift).
+  const firstPageReady = useRouterState({
+    select: (state) => state.resolvedLocation !== undefined,
+  })
   useFocusOnNavigate(MAIN_ID)
 
   return (
@@ -63,9 +73,11 @@ export function RootLayout() {
         <main id={MAIN_ID} tabIndex={-1} className="flex-1 outline-none">
           <Outlet />
         </main>
-        <SiteFooter
-          className={hideMobileFooter ? 'max-md:hidden' : undefined}
-        />
+        {firstPageReady ? (
+          <SiteFooter
+            className={hideMobileFooter ? 'max-md:hidden' : undefined}
+          />
+        ) : null}
       </div>
       {showTabBar ? <MobileTabBar /> : null}
       <Toaster />

@@ -81,7 +81,9 @@ export function Carousel({
         ))}
       </ul>
       {pages > 1 ? (
-        <div className="mt-8 flex justify-center gap-2">
+        // 12px dots 24px apart (center to center) with 24px hit areas:
+        // WCAG 2.5.8 target size (Figma: 8px gaps).
+        <div className="mt-8 flex justify-center gap-3">
           {Array.from({ length: pages }, (_, index) => (
             <button
               key={index}
