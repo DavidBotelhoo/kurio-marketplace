@@ -113,6 +113,8 @@ function useCartMutation<Variables>(
     },
     onSuccess: ({ identity, cart }) => {
       queryClient.setQueryData(cartQueryOptions(identity).queryKey, cart)
+      // The cart changed: its quote must be priced again.
+      void queryClient.invalidateQueries({ queryKey: cartKeys.quote(identity) })
     },
     onError: (error) => {
       // Availability or the line changed on the server: show its current state.
@@ -149,4 +151,38 @@ export function useRemoveCartItem() {
   return useCartMutation((api, guestId, itemId: string) =>
     api.removeCartItem(guestId, itemId),
   )
+}
+
+export function useApplyCoupon() {
+  return useCartMutation(
+    (api, guestId, code: string) => api.applyCoupon(guestId, code),
+    { createGuest: true },
+  )
+}
+
+export function useRemoveCoupon() {
+  return useCartMutation<undefined>((api, guestId) => api.removeCoupon(guestId))
+}
+
+export function quoteQueryOptions(identity: CartIdentity) {
+  return queryOptions({
+    queryKey: cartKeys.quote(identity),
+    queryFn: async ({ signal }) =>
+      (await loadApi()).fetchQuote(
+        identity.kind === 'guest' ? identity.guestId : null,
+        signal,
+      ),
+    // Re-price when the quote expires while the cart is open.
+    refetchInterval: (query) => {
+      const expiresAt = query.state.data?.expiresAt
+      return expiresAt
+        ? Math.max(Date.parse(expiresAt) - Date.now(), 1_000)
+        : false
+    },
+  })
+}
+
+/** Quote of the current cart; idle while the cart is empty. */
+export function useQuote(enabled: boolean) {
+  return useQuery({ ...quoteQueryOptions(useCartIdentity()), enabled })
 }

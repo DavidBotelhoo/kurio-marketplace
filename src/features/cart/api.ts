@@ -5,6 +5,8 @@ import {
   type CartResponse,
   cartResponseSchema,
   GUEST_CART_HEADER,
+  type QuoteResponse,
+  quoteResponseSchema,
 } from '@/contracts/cart'
 import { api } from '@/lib/api/client'
 import { parseResponse } from '@/lib/api/parse'
@@ -73,4 +75,37 @@ export async function mergeGuestCart(
     headers: guestHeaders(guestId),
   })
   return parseResponse(cartMergeResponseSchema, data)
+}
+
+export async function applyCoupon(
+  guestId: string | null,
+  code: string,
+): Promise<CartResponse> {
+  const { data } = await api.put<unknown>(
+    '/cart/coupon',
+    { code },
+    { headers: guestHeaders(guestId) },
+  )
+  return parseResponse(cartResponseSchema, data)
+}
+
+export async function removeCoupon(
+  guestId: string | null,
+): Promise<CartResponse> {
+  const { data } = await api.delete<unknown>('/cart/coupon', {
+    headers: guestHeaders(guestId),
+  })
+  return parseResponse(cartResponseSchema, data)
+}
+
+/** Prices the current cart (coupon, availability, fees and total). */
+export async function fetchQuote(
+  guestId: string | null,
+  signal?: AbortSignal,
+): Promise<QuoteResponse> {
+  const { data } = await api.post<unknown>('/cart/quote', null, {
+    signal,
+    headers: guestHeaders(guestId),
+  })
+  return parseResponse(quoteResponseSchema, data)
 }

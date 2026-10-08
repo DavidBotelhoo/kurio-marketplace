@@ -14,6 +14,12 @@ export const cartKeys = {
     identity.kind === 'user'
       ? cartKeys.user(identity.userId)
       : cartKeys.guest(identity.guestId),
+  /**
+   * Quote of a cart. It lives under the cart key, so invalidating the cart
+   * (realtime changes, reconnection) also re-prices it.
+   */
+  quote: (identity: CartIdentity) =>
+    [...cartKeys.of(identity), 'quote'] as const,
   /** Matches any cart entry (collector or visitor). */
   isCart: (queryKey: QueryKey) =>
     (queryKey[0] === privateKeys.all[0] && queryKey[2] === 'cart') ||

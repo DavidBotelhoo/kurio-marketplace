@@ -1,8 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { ScreenPlaceholder } from '@/components/layout/screen-placeholder'
+import { CartPage } from '@/features/cart/cart-page'
 
 export const Route = createFileRoute('/carrinho')({
   head: () => ({ meta: [{ title: 'Carrinho | Kurio' }] }),
-  component: () => <ScreenPlaceholder title="Carrinho de NFTs" />,
+  // The mobile frame ends with the summary panel.
+  staticData: { mobileFooter: false },
+  component: CartPage,
 })
