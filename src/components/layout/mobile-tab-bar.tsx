@@ -14,8 +14,15 @@ import { CartBadge } from '@/features/cart/components/cart-badge'
 import { cartLabel } from '@/features/cart/labels'
 import { useCartCount } from '@/features/cart/queries'
 
-/** Height of the bar, reserved at the bottom of pages that show it. */
-export const MOBILE_TAB_BAR_HEIGHT = '5.9375rem'
+/** Height of the Figma bar (notch included). */
+const BAR_HEIGHT = '5.9375rem'
+
+/**
+ * Space taken at the bottom of the screen, reserved by pages that show the
+ * bar: the Figma bar plus the area under it that the system or the browser
+ * toolbar covers (home indicator).
+ */
+export const MOBILE_TAB_BAR_HEIGHT = `calc(${BAR_HEIGHT} + env(safe-area-inset-bottom))`
 
 /** Figma tab bar notch (x 131–283 of the 414px frame), in local coordinates. */
 const NOTCH_PATH =
@@ -66,19 +73,23 @@ export function MobileTabBar() {
       className="fixed inset-x-0 bottom-0 z-40 md:hidden"
       style={{ height: MOBILE_TAB_BAR_HEIGHT }}
     >
+      {/* The Figma shape keeps its 95px; the safe area below is plain card. */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 flex drop-shadow-[0_-10px_15px_rgb(10_6_4/0.45)]"
+        className="absolute inset-0 flex flex-col drop-shadow-[0_-10px_15px_rgb(10_6_4/0.45)]"
       >
-        <div className="-mr-px flex-1 rounded-tl-[1.8rem] bg-card" />
-        <svg
-          viewBox="0 0 152 95"
-          className="h-full w-[9.5rem] shrink-0 fill-card"
-          preserveAspectRatio="none"
-        >
-          <path d={NOTCH_PATH} />
-        </svg>
-        <div className="-ml-px flex-1 rounded-tr-[1.8rem] bg-card" />
+        <div className="flex shrink-0" style={{ height: BAR_HEIGHT }}>
+          <div className="-mr-px flex-1 rounded-tl-[1.8rem] bg-card" />
+          <svg
+            viewBox="0 0 152 95"
+            className="h-full w-[9.5rem] shrink-0 fill-card"
+            preserveAspectRatio="none"
+          >
+            <path d={NOTCH_PATH} />
+          </svg>
+          <div className="-ml-px flex-1 rounded-tr-[1.8rem] bg-card" />
+        </div>
+        <div className="-mt-px flex-1 bg-card" />
       </div>
 
       <ul className="relative grid h-full grid-cols-5 items-start px-2 pt-[1.75rem] pb-[env(safe-area-inset-bottom)]">

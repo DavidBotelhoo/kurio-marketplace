@@ -16,7 +16,7 @@ export function NotFound({
   actions,
 }: NotFoundProps) {
   return (
-    <section className="container-page grid min-h-[60vh] place-content-center justify-items-center gap-4 py-16 text-center">
+    <section className="container-page grid min-h-[60dvh] place-content-center justify-items-center gap-4 py-16 text-center">
       <p className="text-14 font-bold tracking-brand text-highlight">
         ERRO 404
       </p>

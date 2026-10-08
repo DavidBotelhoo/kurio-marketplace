@@ -9,6 +9,8 @@ function Toaster(props: ToasterProps) {
     <Sonner
       theme="dark"
       position="bottom-right"
+      // Phones: above the home indicator or the browser toolbar.
+      mobileOffset={{ bottom: 'calc(16px + env(safe-area-inset-bottom))' }}
       closeButton
       containerAriaLabel="Notificações"
       toastOptions={{

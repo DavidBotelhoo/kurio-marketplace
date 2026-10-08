@@ -193,7 +193,7 @@ export function MockPanel() {
   const operations = new Map(listOperations().map((op) => [op.id, op.label]))
 
   return (
-    <div className="fixed bottom-[6.75rem] left-3 z-50 font-sans text-13 text-foreground md:bottom-4 md:left-4">
+    <div className="fixed bottom-[calc(6.75rem+env(safe-area-inset-bottom))] left-[max(0.75rem,env(safe-area-inset-left))] z-50 font-sans text-13 text-foreground md:bottom-4 md:left-4">
       {open ? (
         <section
           ref={panelRef}

@@ -502,7 +502,7 @@ function Checkout({
 
 function EmptyCheckout() {
   return (
-    <section className="container-page grid min-h-[50vh] place-content-center justify-items-center gap-4 py-16 text-center">
+    <section className="container-page grid min-h-[50dvh] place-content-center justify-items-center gap-4 py-16 text-center">
       <h1 className="text-24 font-bold">Seu carrinho está vazio</h1>
       <p className="max-w-sm text-15 text-muted-foreground">
         Adicione NFTs ao carrinho para seguir com o pagamento.

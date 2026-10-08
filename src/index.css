@@ -81,12 +81,31 @@
   }
 }
 
-/* Page column: 1200px of content plus gutters, centered. */
+/*
+ * Page column: 1200px of content plus gutters, centered. The page covers the
+ * whole screen (viewport-fit=cover), so the gutters also clear the notch and
+ * rounded corners in landscape.
+ */
 @utility container-page {
   width: 100%;
   max-width: calc(var(--container-content) + 2 * var(--gutter));
   margin-inline: auto;
-  padding-inline: var(--gutter);
+  padding-inline: max(var(--gutter), env(safe-area-inset-left))
+    max(var(--gutter), env(safe-area-inset-right));
+}
+
+/*
+ * iOS zooms into a focused field whose text is under 16px and leaves the page
+ * zoomed afterwards, so the layout no longer fits the screen. On iOS only,
+ * fields use 16px; elsewhere they keep the Figma sizes. Unlayered on purpose:
+ * it must win over the size utilities.
+ */
+@supports (-webkit-touch-callout: none) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
 }
 
 @theme inline {

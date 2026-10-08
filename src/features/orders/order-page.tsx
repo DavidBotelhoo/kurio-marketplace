@@ -158,7 +158,7 @@ export function OrderPage() {
 
   if (desktop) {
     return (
-      <div className="min-h-[60vh]">
+      <div className="min-h-[60dvh]">
         <Dialog
           open
           onOpenChange={(open) => {

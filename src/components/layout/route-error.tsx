@@ -25,7 +25,7 @@ export function RouteError({ error, reset }: ErrorComponentProps) {
   return (
     <section
       role="alert"
-      className="container-page grid min-h-[60vh] place-content-center justify-items-center gap-4 py-16 text-center"
+      className="container-page grid min-h-[60dvh] place-content-center justify-items-center gap-4 py-16 text-center"
     >
       <h1 className="text-28 font-bold">Algo deu errado</h1>
       <p className="max-w-md text-15 text-muted-foreground">{message}</p>
