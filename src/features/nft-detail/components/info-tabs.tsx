@@ -28,7 +28,9 @@ export function InfoTabs({
     <Tabs.Root defaultValue="details" className={className}>
       <Tabs.List
         aria-label="Informações do NFT"
-        className="flex gap-6 overflow-x-auto border-b border-primary/30 md:gap-8"
+        // Horizontal scrolling only where the labels do not fit; the active
+        // underline overlaps the border by 1px, which must not scroll.
+        className="flex [scrollbar-width:none] gap-6 overflow-x-auto overflow-y-hidden border-b border-primary/30 md:gap-8 md:overflow-visible [&::-webkit-scrollbar]:hidden"
       >
         <Tabs.Trigger value="details" className={triggerClass}>
           Detalhes do NFT
