@@ -9,6 +9,7 @@ export function createSeed(dataset: DatasetId): MockDatabase {
     dataset,
     seededAt: SEED_DATE,
     users: structuredClone([...USERS]),
+    sessions: [],
     nfts: dataset === 'empty-catalog' ? [] : createCatalogFixtures(),
   }
 }

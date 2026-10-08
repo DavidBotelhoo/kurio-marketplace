@@ -18,6 +18,7 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.9.1",
     "@mswjs/socket.io-binding": "^0.2.0",
     "@tanstack/react-query": "^5.104.1",
     "@tanstack/react-router": "^1.170.41",
@@ -28,6 +29,7 @@
     "radix-ui": "^1.7.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
+    "react-hook-form": "^7.89.0",
     "socket.io-client": "^4.8.4",
     "sonner": "^2.0.8",
     "zod": "^4.6.5"

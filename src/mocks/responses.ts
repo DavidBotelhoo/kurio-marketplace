@@ -5,6 +5,7 @@ import type { ApiErrorBody, ApiErrorCode } from '@/contracts/errors'
 const MESSAGES: Record<ApiErrorCode, string> = {
   VALIDATION_ERROR: 'Confira os dados informados.',
   UNAUTHENTICATED: 'Entre na sua conta para continuar.',
+  INVALID_CREDENTIALS: 'E-mail ou senha incorretos.',
   SESSION_EXPIRED: 'Sua sessão expirou. Entre novamente para continuar.',
   FORBIDDEN: 'Você não tem permissão para acessar este recurso.',
   NOT_FOUND: 'Recurso não encontrado.',

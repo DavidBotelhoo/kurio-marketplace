@@ -17,6 +17,7 @@ import { HIGHLIGHTS } from '../fixtures/catalog'
 import { route } from '../http'
 import { displayPrice, toNftDetail, toNftSummary } from '../mappers/catalog'
 import { apiError } from '../responses'
+import { fieldErrors } from '../validation'
 
 const RELATED_LIMIT = 10
 
@@ -104,13 +105,9 @@ export const catalogHandlers = [
         readQuery(new URL(request.url)),
       )
       if (!parsed.success) {
-        const fields = Object.fromEntries(
-          parsed.error.issues.map((issue) => [
-            issue.path.join('.'),
-            'Parâmetro inválido.',
-          ]),
-        )
-        return apiError(400, 'VALIDATION_ERROR', { fields })
+        return apiError(400, 'VALIDATION_ERROR', {
+          fields: fieldErrors(parsed.error.issues),
+        })
       }
       const params = parsed.data
       if (

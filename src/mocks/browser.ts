@@ -12,6 +12,7 @@ import {
   setMockConfig,
   updateMockConfig,
 } from './config'
+import { activeSessionCount, expireAllSessions } from './auth'
 import { db } from './db/database'
 import { changeNftPrice, setEditionAvailability } from './domain/catalog'
 import type { MockDatabase } from './db/schema'
@@ -72,6 +73,10 @@ export interface KurioMocksApi {
   resetAll: () => void
   snapshot: () => MockDatabase
   operations: () => OperationInfo[]
+  auth: {
+    expireSessions: () => void
+    activeSessions: () => number
+  }
   /** Server-side realtime controls; events reach the app via socket.io-client. */
   realtime: {
     changePrice: typeof changeNftPrice
@@ -116,6 +121,10 @@ export async function startMocks(overrides: MockUrlOverrides) {
     resetAll: resetMockEnvironment,
     snapshot: () => structuredClone(db.read()),
     operations: listOperations,
+    auth: {
+      expireSessions: expireAllSessions,
+      activeSessions: activeSessionCount,
+    },
     realtime: {
       changePrice: changeNftPrice,
       setAvailability: setEditionAvailability,

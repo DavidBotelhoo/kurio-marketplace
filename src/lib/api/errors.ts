@@ -10,6 +10,7 @@ export type ClientErrorCode = ApiErrorCode | TransportErrorCode | 'UNKNOWN'
 const DEFAULT_MESSAGES: Record<ClientErrorCode, string> = {
   VALIDATION_ERROR: 'Confira os dados informados.',
   UNAUTHENTICATED: 'Entre na sua conta para continuar.',
+  INVALID_CREDENTIALS: 'E-mail ou senha incorretos.',
   SESSION_EXPIRED: 'Sua sessão expirou. Entre novamente para continuar.',
   FORBIDDEN: 'Você não tem permissão para acessar este recurso.',
   NOT_FOUND: 'Não encontramos o que você procurava.',

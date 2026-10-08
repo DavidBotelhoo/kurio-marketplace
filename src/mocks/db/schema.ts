@@ -6,7 +6,7 @@ import type { CategoryId, NetworkId } from '@/contracts/catalog'
  */
 
 /** Bump whenever record shapes change; stale snapshots are reseeded. */
-export const DB_VERSION = 3
+export const DB_VERSION = 4
 
 /**
  * Seed variants: "default" is the full catalog; "empty-catalog" keeps users
@@ -66,11 +66,22 @@ export interface NftRecord {
   updatedAt: string
 }
 
+export interface SessionRecord {
+  /** Opaque bearer token. */
+  token: string
+  userId: string
+  createdAt: string
+  expiresAt: string
+  /** Set by logout; revoked tokens answer 401 UNAUTHENTICATED. */
+  revokedAt: string | null
+}
+
 export interface MockDatabase {
   /** Bumped whenever the record shapes change; older snapshots are reseeded. */
   version: number
   dataset: DatasetId
   seededAt: string
   users: UserRecord[]
+  sessions: SessionRecord[]
   nfts: NftRecord[]
 }

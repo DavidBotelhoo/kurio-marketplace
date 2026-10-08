@@ -58,6 +58,8 @@ export const mockConfigSchema = z.object({
   failures: z.array(failureRuleSchema),
   /** Seed for every pseudo-random decision (latency jitter). */
   seed: z.int(),
+  /** Lifetime of new sessions. */
+  sessionTtlSeconds: z.int().check(z.positive()),
   /** Shows the floating control panel (hidden in visual regression tests). */
   panel: z.boolean(),
 })
@@ -71,6 +73,7 @@ export const DEFAULT_CONFIG: MockConfig = {
   offline: false,
   failures: [],
   seed: 2026,
+  sessionTtlSeconds: 8 * 60 * 60,
   panel: true,
 }
 
@@ -129,6 +132,12 @@ export const SCENARIO_PRESETS = {
         },
       ],
     },
+  },
+  'short-session': {
+    label: 'Sessão curta',
+    description:
+      'Sessões expiram 60 s após o login: a próxima ação privada pede novo login e retoma o fluxo.',
+    config: { sessionTtlSeconds: 60 },
   },
   'server-errors': {
     label: 'Erros no servidor',
