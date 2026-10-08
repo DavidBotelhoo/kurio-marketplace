@@ -15,10 +15,9 @@ dist-ssr
 # Figma exports used as reference only (assets used by the app live in src/ and public/)
 design/
 
-# Environment
-.env
-.env.*
-!.env.example
+# Environment (.env holds non-secret defaults and is versioned)
+.env.local
+.env.*.local
 
 # Test and audit artifacts (published reports live in docs/)
 playwright-report

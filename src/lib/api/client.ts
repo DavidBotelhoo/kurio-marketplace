@@ -3,6 +3,7 @@ import axios, { type InternalAxiosRequestConfig, isAxiosError } from 'axios'
 import { env } from '@/lib/env'
 
 import { ApiError, toApiError } from './errors'
+import { waitForRequestGate } from './request-gate'
 
 export const REQUEST_TIMEOUT_MS = 10_000
 
@@ -39,7 +40,8 @@ export const api = axios.create({
   paramsSerializer: { indexes: null },
 })
 
-api.interceptors.request.use((config) => {
+api.interceptors.request.use(async (config) => {
+  await waitForRequestGate()
   const controller = new AbortController()
   const state: TimeoutState = {
     timedOut: false,

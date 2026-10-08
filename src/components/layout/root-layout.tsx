@@ -61,8 +61,8 @@ export function RootLayout() {
       {showTabBar ? <MobileTabBar /> : null}
       <Toaster />
       <Suspense>
-        <RouterDevtools position="bottom-left" />
-        <QueryDevtools buttonPosition="bottom-left" />
+        <RouterDevtools position="top-right" />
+        <QueryDevtools buttonPosition="bottom-right" />
       </Suspense>
     </>
   )

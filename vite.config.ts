@@ -18,9 +18,25 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  optimizeDeps: {
+    // Dependencies reached only through dynamic imports (mock layer, dev tools).
+    // Pre-bundling them up front avoids a full page reload on first discovery,
+    // which would drop the one-shot ?mock-scenario / ?mock-reset switches.
+    include: [
+      'msw',
+      'msw/browser',
+      'zod/mini',
+      '@tanstack/react-router-devtools',
+      '@tanstack/react-query-devtools',
+    ],
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
+      // MSW → tough-cookie → tldts: drop the Public Suffix List (see the stub).
+      tldts: fileURLToPath(
+        new URL('./src/mocks/vendor/tldts-lite.ts', import.meta.url),
+      ),
     },
   },
 })
