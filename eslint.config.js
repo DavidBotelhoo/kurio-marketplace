@@ -1,4 +1,6 @@
 import js from '@eslint/js'
+import pluginQuery from '@tanstack/eslint-plugin-query'
+import pluginRouter from '@tanstack/eslint-plugin-router'
 import prettier from 'eslint-config-prettier'
 import jsxA11y from 'eslint-plugin-jsx-a11y-x'
 import reactHooks from 'eslint-plugin-react-hooks'
@@ -26,6 +28,8 @@ export default defineConfig([
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
       jsxA11y.configs.recommended,
+      pluginQuery.configs['flat/recommended'],
+      pluginRouter.configs['flat/recommended'],
     ],
     languageOptions: {
       ecmaVersion: 2023,
@@ -36,6 +40,11 @@ export default defineConfig([
       },
     },
     rules: {
+      // Route files export `Route`; TanStack's code splitting keeps HMR working.
+      'react-refresh/only-export-components': [
+        'error',
+        { allowConstantExport: true, allowExportNames: ['Route'] },
+      ],
       '@typescript-eslint/consistent-type-imports': [
         'error',
         { fixStyle: 'inline-type-imports' },

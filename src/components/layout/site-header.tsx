@@ -1,0 +1,124 @@
+import { Link, useLocation } from '@tanstack/react-router'
+
+import { CartIcon, LoginIcon, SearchIcon } from '@/components/icons'
+import { Button } from '@/components/ui/button'
+import { UnavailableAction } from '@/components/unavailable-action'
+import { cn } from '@/lib/utils'
+
+/** Catalog anchor on the home page; "Mercado" scrolls to it. */
+export const CATALOG_HASH = 'mercado'
+
+const MARKET_PATHS = /^\/(nfts|carrinho|pagamento|pedidos)(\/|$)/
+
+const navItemClass =
+  'relative block px-2.5 pt-[3px] pb-6 text-16 whitespace-nowrap text-foreground transition-colors hover:text-highlight data-[active=true]:font-bold data-[active=true]:text-highlight data-[active=true]:after:absolute data-[active=true]:after:inset-x-0 data-[active=true]:after:-bottom-px data-[active=true]:after:h-[3px] data-[active=true]:after:bg-primary'
+
+function useActiveSection() {
+  const { pathname, hash } = useLocation()
+  if (pathname === '/') return hash === CATALOG_HASH ? 'market' : 'home'
+  if (MARKET_PATHS.test(pathname)) return 'market'
+  return null
+}
+
+function MainNav() {
+  const active = useActiveSection()
+
+  return (
+    <nav aria-label="Principal">
+      <ul className="flex gap-6 lg:gap-[2.375rem]">
+        <li>
+          <Link
+            to="/"
+            activeOptions={{ exact: true, includeHash: true }}
+            data-active={active === 'home'}
+            className={navItemClass}
+          >
+            Início
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/"
+            hash={CATALOG_HASH}
+            activeOptions={{ exact: true, includeHash: true }}
+            data-active={active === 'market'}
+            className={navItemClass}
+          >
+            Mercado
+          </Link>
+        </li>
+        <li>
+          <UnavailableAction
+            feature="A página de criadores"
+            className={cn(navItemClass, 'cursor-pointer')}
+          >
+            Criadores
+          </UnavailableAction>
+        </li>
+        <li>
+          <UnavailableAction
+            feature="A central de conteúdos"
+            className={cn(navItemClass, 'cursor-pointer')}
+          >
+            Aprenda
+          </UnavailableAction>
+        </li>
+      </ul>
+    </nav>
+  )
+}
+
+function HeaderActions() {
+  return (
+    <div className="flex items-center gap-7">
+      <Link
+        to="/"
+        hash={CATALOG_HASH}
+        aria-label="Buscar NFTs"
+        className="text-foreground transition-colors hover:text-highlight"
+      >
+        <SearchIcon className="size-5" />
+      </Link>
+      <Link
+        to="/carrinho"
+        aria-label="Carrinho"
+        className="relative text-foreground transition-colors hover:text-highlight"
+      >
+        <CartIcon className="size-6" />
+      </Link>
+      <Button
+        asChild
+        size="sm"
+        className="h-[2.1875rem] gap-1.5 px-2.5 text-16 font-medium"
+      >
+        <Link to="/login">
+          <LoginIcon className="size-4" />
+          Entrar
+        </Link>
+      </Button>
+    </div>
+  )
+}
+
+/** Desktop and tablet header. Mobile screens use the bottom tab bar. */
+export function SiteHeader() {
+  return (
+    <header className="hidden md:block">
+      <div className="container-page">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-6 border-b border-primary/40 pt-6">
+          <Link
+            to="/"
+            aria-label="Kurio, página inicial"
+            className="mt-2.5 justify-self-start text-14 font-bold tracking-brand text-foreground"
+          >
+            KURIO
+          </Link>
+          <MainNav />
+          <div className="justify-self-end">
+            <HeaderActions />
+          </div>
+        </div>
+      </div>
+    </header>
+  )
+}

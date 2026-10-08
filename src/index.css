@@ -70,6 +70,23 @@
   --subtle-foreground: #b39463;
   --border-strong: #55321f;
   --band: #38220f;
+
+  /* Horizontal page gutter; desktop keeps the 1200px Figma column. */
+  --gutter: 1.5rem;
+}
+
+@media (width >= 64rem) {
+  :root {
+    --gutter: 2rem;
+  }
+}
+
+/* Page column: 1200px of content plus gutters, centered. */
+@utility container-page {
+  width: 100%;
+  max-width: calc(var(--container-content) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
 }
 
 @theme inline {
