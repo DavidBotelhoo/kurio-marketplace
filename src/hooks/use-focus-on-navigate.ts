@@ -14,6 +14,8 @@ export function useFocusOnNavigate(mainId: string) {
     () =>
       router.subscribe('onRendered', ({ fromLocation, pathChanged }) => {
         if (!fromLocation || !pathChanged) return
+        // An open dialog manages its own focus (and traps it).
+        if (document.querySelector('[role="dialog"][data-state="open"]')) return
         const main = document.getElementById(mainId)
         const target = main?.querySelector<HTMLElement>('h1') ?? main
         if (!target) return

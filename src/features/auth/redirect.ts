@@ -16,6 +16,13 @@ export function safeRedirect(value: unknown): string | undefined {
   return value
 }
 
+/** Paths behind the session guard (see routes/_authenticated). */
+const PRIVATE_PATH = /^\/(pagamento|pedidos|perfil)(\/|$|\?)/
+
+export function isPrivatePath(path: string) {
+  return PRIVATE_PATH.test(path)
+}
+
 export interface AuthSearch {
   redirect?: string
   reason?: 'expired' | 'required'

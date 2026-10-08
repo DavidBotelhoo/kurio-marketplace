@@ -34,6 +34,10 @@ export function RootLayout() {
     select: (matches) =>
       matches.some((match) => match.staticData.mobileTabBar === true),
   })
+  const hideMobileFooter = useMatches({
+    select: (matches) =>
+      matches.some((match) => match.staticData.mobileFooter === false),
+  })
   useFocusOnNavigate(MAIN_ID)
 
   return (
@@ -57,7 +61,9 @@ export function RootLayout() {
         <main id={MAIN_ID} tabIndex={-1} className="flex-1 outline-none">
           <Outlet />
         </main>
-        <SiteFooter />
+        <SiteFooter
+          className={hideMobileFooter ? 'max-md:hidden' : undefined}
+        />
       </div>
       {showTabBar ? <MobileTabBar /> : null}
       <Toaster />

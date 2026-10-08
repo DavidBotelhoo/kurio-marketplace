@@ -10,6 +10,7 @@ import {
 } from '@/components/icons'
 import { UnavailableAction } from '@/components/unavailable-action'
 import { notifyUnavailable } from '@/lib/unavailable'
+import { cn } from '@/lib/utils'
 
 const FEATURES = [
   {
@@ -103,9 +104,9 @@ function Newsletter() {
   )
 }
 
-export function SiteFooter() {
+export function SiteFooter({ className }: { className?: string | undefined }) {
   return (
-    <footer className="container-page mt-20 pb-4">
+    <footer className={cn('container-page mt-20 pb-4', className)}>
       <section
         aria-label="Destaques da Kurio"
         className="grid gap-8 bg-card px-6 py-8 sm:grid-cols-2 lg:grid-cols-[repeat(3,minmax(0,1fr))_minmax(0,1.3fr)] lg:gap-0 lg:px-12 lg:pt-[1.875rem] lg:pb-7 xl:grid-cols-[15.5625rem_16.5625rem_16.625rem_minmax(0,1fr)]"

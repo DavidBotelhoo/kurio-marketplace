@@ -33,5 +33,7 @@ declare module '@tanstack/react-router' {
   interface StaticDataRouteOption {
     /** Shows the bottom tab bar on mobile (top-level sections only). */
     mobileTabBar?: boolean
+    /** false hides the site footer on mobile (focused, app-like screens). */
+    mobileFooter?: boolean
   }
 }
