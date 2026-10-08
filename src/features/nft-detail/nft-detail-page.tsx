@@ -73,8 +73,15 @@ function EditionBlock({
   onSelectEdition,
   className,
 }: LayoutProps & { className?: string }) {
+  // xl: the status (not in Figma) sits beside the chips, so the column keeps
+  // the frame's height.
   return (
-    <div className={className}>
+    <div
+      className={cn(
+        'xl:flex xl:items-end xl:justify-between xl:gap-6',
+        className,
+      )}
+    >
       <EditionPicker
         editions={nft.editions}
         selectedId={edition?.id}
@@ -87,7 +94,7 @@ function EditionBlock({
         allSoldOut={nft.availability === 'sold-out'}
         inCart={purchase.inCart}
         remaining={purchase.remaining}
-        className="mt-2.5"
+        className="mt-2.5 xl:mt-0 xl:mb-1 xl:max-w-[18rem] xl:text-right"
       />
     </div>
   )
@@ -126,7 +133,10 @@ function DesktopLayout(props: LayoutProps) {
           <h1 className="text-24 leading-[1.2] font-bold xl:text-28">
             {nft.name}
           </h1>
-          <div className="mt-2 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-primary/30 pb-2.5">
+          {/* xl: the purchase column spans the gallery's height (Figma
+              baselines: price 196, "Sobre" 237, "Edição" 345, buttons at
+              400, facts every 32px, share 574). */}
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-primary/30 pb-2.5 xl:gap-x-4 xl:pb-1.5">
             <p
               className={cn(
                 'rounded-sm text-22 transition-colors',
@@ -146,20 +156,25 @@ function DesktopLayout(props: LayoutProps) {
             />
           </div>
 
-          <h2 className="mt-6 text-15 font-bold">Sobre este NFT:</h2>
-          <p className="mt-2.5 max-w-[36rem] text-14 leading-[1.55] text-muted-foreground">
+          <h2 className="mt-6 text-15 font-bold xl:mt-[0.6875rem]">
+            Sobre este NFT:
+          </h2>
+          <p className="mt-2.5 max-w-[36rem] text-14 leading-[1.55] text-muted-foreground xl:mt-[0.5625rem] xl:leading-6">
             {nft.description}
           </p>
 
-          <EditionBlock {...props} className="mt-4" />
-          <div className="mt-5">
+          <EditionBlock {...props} className="mt-4 xl:mt-1" />
+          <div className="mt-5 xl:mt-3.5">
             <PurchaseActions {...props} />
           </div>
-          <TokenFacts nft={nft} className="mt-6" />
+          <TokenFacts
+            nft={nft}
+            className="mt-6 xl:mt-[0.8125rem] xl:gap-[0.6875rem] xl:leading-[1.3125rem]"
+          />
           <ShareLinks
             name={nft.name}
             path={`/nfts/${nft.id}`}
-            className="mt-3"
+            className="mt-3 xl:mt-1.5"
           />
         </div>
       </div>
