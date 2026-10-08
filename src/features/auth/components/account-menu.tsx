@@ -34,7 +34,15 @@ export default function AccountMenu({ user }: { user: User }) {
           className={accountTriggerClass}
           aria-label={`Conta de ${user.displayName}`}
         >
-          <UserFilledIcon className="size-4" />
+          {user.avatarUrl ? (
+            <img
+              src={user.avatarUrl}
+              alt=""
+              className="size-5 rounded-full object-cover"
+            />
+          ) : (
+            <UserFilledIcon className="size-4" />
+          )}
           <span className="max-w-[8ch] truncate">{firstName}</span>
         </Button>
       </DropdownMenuTrigger>

@@ -26,7 +26,7 @@ const PROVIDER_OPTIONS = WALLET_PROVIDERS.map(({ id, label }) => ({
 }))
 
 /** "Nome ENS": suffix select and name, as in the Figma field. */
-function EnsNameField() {
+export function EnsNameField() {
   const {
     register,
     formState: { errors },
