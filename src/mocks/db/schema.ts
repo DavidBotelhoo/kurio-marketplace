@@ -6,7 +6,7 @@ import type { CategoryId, NetworkId } from '@/contracts/catalog'
  */
 
 /** Bump whenever record shapes change; stale snapshots are reseeded. */
-export const DB_VERSION = 2
+export const DB_VERSION = 3
 
 /**
  * Seed variants: "default" is the full catalog; "empty-catalog" keeps users
